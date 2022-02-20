@@ -1,0 +1,49 @@
+/*********************************
+    Text rendering
+*********************************/
+
+/* Emphasise text */
+.reveal em {
+    color: rgb(40, 148, 207);
+}
+
+.reveal strong {
+    color: rgb(233, 91, 95);
+}
+
+.reveal a {
+    color: rgb(69,190,174);
+}
+
+/*********************************
+    Code highlight
+*********************************/
+
+/* Code block */
+.reveal pre > code {
+    font-family: 'Source Code Pro', monospace;
+    font-weight: 300;
+    font-size: 0.8em;
+    background-color: #1d2028;
+    max-height: 600px;
+}
+
+/* Inline code */
+.reveal code {
+    background-color: #1d2028;
+    max-width: 100%;
+    overflow-x: auto;
+    vertical-align: middle;
+    padding: 0.2em;
+    font-family: "Fira Code", monospace;
+    font-size: 0.6em;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    -webkit-box-shadow: inset 0 1px 10px rgba(0, 0, 0, 0.3),
+      0 1px 0 rgba(255, 255, 255, 0.1), 0 -1px 0 rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: inset 0 1px 10px rgba(0, 0, 0, 0.3),
+      0 1px 0 rgba(255, 255, 255, 0.1), 0 -1px 0 rgba(0, 0, 0, 0.5);
+    box-shadow: inset 0 1px 10px rgba(0, 0, 0, 0.3),
+      0 1px 0 rgba(255, 255, 255, 0.1), 0 -1px 0 rgba(0, 0, 0, 0.5);
+  }

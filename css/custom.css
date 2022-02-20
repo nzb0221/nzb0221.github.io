@@ -1,0 +1,171 @@
+html,
+body {
+  background-color: #252a34;
+}
+
+/* Logos */
+
+.angular-logo {
+  font-size: 3em;
+}
+
+.angular-logo-medium {
+  font-size: 1.2em;
+}
+
+.angular-logo-small {
+  font-size: 1em;
+}
+
+.reveal section img {
+  background: none;
+  border: none;
+  box-shadow: none;
+}
+
+.reveal ul {
+  display: block;
+  text-align: left;
+}
+
+th {
+  color: #74ede5;
+}
+
+/*
+p > code, td > code, li > code {
+    color: white;
+    font-size: 70% !important;
+    letter-spacing: 0;
+    padding: 2px 0 !important;
+    background-color: lightslategrey;
+    border-radius: 4px;
+}
+*/
+
+/* Code */
+
+.reveal pre > code {
+  font-family: "Fira Code", monospace;
+  font-size: 0.8em;
+  background-color: #1d2028;
+}
+
+.reveal code {
+  background-color: #1d2028;
+  max-width: 100%;
+  overflow-x: auto;
+  vertical-align: middle;
+  padding: 0 0.5em;
+  font-family: "Fira Code", monospace;
+  font-size: 0.6em;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  -webkit-box-shadow: inset 0 1px 10px rgba(0, 0, 0, 0.3),
+    0 1px 0 rgba(255, 255, 255, 0.1), 0 -1px 0 rgba(0, 0, 0, 0.5);
+  -moz-box-shadow: inset 0 1px 10px rgba(0, 0, 0, 0.3),
+    0 1px 0 rgba(255, 255, 255, 0.1), 0 -1px 0 rgba(0, 0, 0, 0.5);
+  box-shadow: inset 0 1px 10px rgba(0, 0, 0, 0.3),
+    0 1px 0 rgba(255, 255, 255, 0.1), 0 -1px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* Fonts */
+.reveal h1 {
+  font-family: 'Roboto', sans-serif;
+  text-transform: none;
+  font-weight: 300;
+}
+
+.reveal h2 {
+  font-family: 'Roboto', sans-serif;
+  text-transform: none;
+  font-weight: 300;
+}
+
+.reveal h3 {
+  font-family: 'Roboto', sans-serif;
+  text-transform: none;
+  font-weight: 300;
+}
+
+.reveal li {
+  font-family: 'Roboto', sans-serif;
+  text-transform: none;
+  font-weight: 100;
+}
+
+.reveal small {
+  font-family: 'Roboto', sans-serif;
+  text-transform: none;
+  font-weight: 100;
+}
+
+/* Emoji */
+
+span.emoji-steam-face::before {
+  content: "😤";
+}
+
+span.emoji-angry-face::before {
+  content: "🤬";
+}
+
+span.emoji-rocket::before {
+  content: "🚀";
+}
+
+.emoji-3-font-size {
+  font-size: 3em;
+}
+
+/* Author, first page */
+
+.main-icon {
+  font-size: 1.5em;
+}
+
+.red-heart {
+  color: magenta;
+}
+
+/* Text highlight */
+
+.text-highlight {
+  color: #ffcc00;
+  font-style: italic;
+}
+
+.text-highlight-yellow {
+  color: #ffcc00;
+}
+
+.text-highlight-orange {
+  color: #ff5733;
+}
+
+.text-highlight-red {
+  color: #c00;
+}
+
+.text-highlight-violet {
+  color: #900c3f;
+}
+
+.text-highlight-violet-dark {
+  color: #581845;
+}
+
+span.emoji-thanks::before {
+  content: "🙏";
+}
+
+span.emoji-big-thanks {
+  font-size: 40px;
+}
+
+span.emoji-big-thanks::before {
+  content: "🙏";
+  font-size: 100px;
+  display: block;
+}
