@@ -1,0 +1,32 @@
+<section>
+    <h2>For:</h2>
+    <pre data-cc="false" data-badge="app-component.ts" data-badge-class="demo">
+        <code class="typescript">
+import { Component, OnInit, VERSION } from '@angular/core';
+
+@Component({
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.css'],
+})
+export class AppComponent implements OnInit {
+    name = 'Angular ' + VERSION.major;
+
+    constructor() { }
+
+    ngOnInit(): void {
+    }
+
+}
+        </code>
+    </pre>
+    <div class="r-stack">
+        <p class="fragment fade-in-then-out" data-code-focus="5">
+            Here is the definition for the app-component available in html through
+            &lt;app-root&gt; tag!
+        </p>
+        <p class="fragment fade-in-then-out" data-code-focus="6">
+            The html code for this is defined in: app.component.html
+        </p>
+    </div>
+</section>

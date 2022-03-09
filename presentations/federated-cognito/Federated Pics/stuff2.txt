@@ -1,0 +1,36 @@
+https://stackoverflow.com/questions/58582112/webflux-spring-boot-oauth2-client-with-http-proxy-support
+
+
+@EnableWebFluxSecurity
+public class WebSecurityConfiguration {
+
+  @Bean
+  public ReactiveOAuth2AuthorizedClientManager authorizedClientManager(
+      ReactiveClientRegistrationRepository clientRegistrationRepository,
+      ReactiveOAuth2AuthorizedClientService authorizedClientService) {
+
+    ReactiveOAuth2AuthorizedClientProvider authorizedClientProvider =
+        ReactiveOAuth2AuthorizedClientProviderBuilder.builder()
+            .clientCredentials()
+            .build();
+
+    AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager authorizedClientManager =
+        new AuthorizedClientServiceReactiveOAuth2AuthorizedClientManager(
+            clientRegistrationRepository, authorizedClientService);
+    authorizedClientManager.setAuthorizedClientProvider(authorizedClientProvider);
+
+    return authorizedClientManager;
+  }
+
+  @Bean
+  public WebClient webClient(ReactiveOAuth2AuthorizedClientManager authorizedClientManager) {
+    ServerOAuth2AuthorizedClientExchangeFilterFunction oauth =new ServerOAuth2AuthorizedClientExchangeFilterFunction(authorizedClientManager);
+    return WebClient.builder().filter(oauth).build();
+  }
+}
+
+https://developer.okta.com/blog/2018/09/24/reactive-apis-with-spring-webflux
+
+http://confluence/display/DICE/TMO+App+Behind+Security+Gateway
+
+http://confluence/display/ATEAM/TMO+AWS+Architecture

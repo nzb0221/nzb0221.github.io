@@ -1,0 +1,436 @@
+<section>
+    <h2>Breakdown of the Onlogin() </h2>
+    <pre data-cc="false" data-badge="home-component.ts" data-badge-class="demo">
+        <code class="typescript">
+import { Component } from '@angular/core';
+import { AwsService } from './aws.service';
+import { cognitoAuthConfig } from './auth.cognito.config';
+import { filter } from 'rxjs/operators';
+import { OAuthService, NullValidationHandler } from 'angular-oauth2-oidc';
+import { Router } from '@angular/router';
+import { useHash } from '../../flags';
+import { environment } from './../../environments/environment';
+
+@Component({
+    selector: 'app-home',
+    templateUrl: './home.component.html',
+    styleUrls: ['./home.component.css']
+})
+export class HomeComponent {
+    title = 'Amazon Cognito Demo';
+    token: any;
+    provider: string = "";
+    googleUser: any;
+    user: any;
+    googleConfirmed: string = "";
+    disableInput: boolean = true;
+    disableUserInput: boolean = true;
+    username: string = "";
+    password: string = "";
+    errorMessage: string = "";
+    redError: string = "";
+    loggedInCreds = {
+        accessKey: "",
+        secretKey: "",
+        sessionToken: "",
+        token: ""
+    };
+    success: string = "";
+
+    testState: string = "";
+    chosenProvider: string = "";
+
+    constructor(private awsService: AwsService,
+        private router: Router,
+        private oauthService: OAuthService) {
+        console.log("HomeComponent:constructor()");
+        //was at bottom inside else moved here for testing
+        this.configureCognitoPKCEFlow();
+        // Automatically load user profile
+        this.oauthService.events
+            .pipe(filter((e) => e.type === 'token_received'))
+            .subscribe((_) => {
+                this.oauthService.loadUserProfile();
+                let idToken = this.oauthService.getIdToken();
+                let state: string | undefined = this.oauthService.state;
+                this.chosenProvider = localStorage.getItem("chosenProvider")!;
+                console.log(`"idToken: ${idToken}"`);
+                console.log(`state: "${state}"`);
+                console.log(`chosenProvider: "${this.chosenProvider}"`);
+                const scopes = this.oauthService.getGrantedScopes();
+                console.log('scopes', scopes);
+                console.log(`this.chosenProvider: "${this.chosenProvider}"`);
+                console.log(`this.username: "${this.username}"`);
+                console.log(`this.password: "${this.password}"`);
+                if (this.chosenProvider == "okta_cup") {
+                    this.cognitoOktaFederatedUserPoolCallback(null, idToken);
+                } else if (this.chosenProvider == "okta_cip") {
+                    this.awsService.authenticateOktaIdentityPool(idToken, this);
+                } else {
+                    //default
+                    this.awsService.authenticateOktaIdentityPool(idToken, this);
+                }
+                // this.cognitoOktaFederatedIdenityPoolCallback(null, idToken, state, scopes);
+            });
+
+        // this.oauthService.events.subscribe((e) => {
+        // // tslint:disable-next-line:no-console
+        // console.log('oauth/oidc event', e);
+        // });
+        let idToken = this.oauthService.getIdToken();
+        // Convert accessToken to STS token
+        if (idToken != null &&
+            idToken != undefined &&
+            idToken != "") {
+            let claims = this.oauthService.getIdentityClaims();
+            let state: string | undefined = this.oauthService.state;
+            console.log(`state: "${state}"`);
+            console.log('idToken: ' + idToken);
+            if (this.chosenProvider == "okta_cip") {
+                this.awsService.authenticateOktaIdentityPool(idToken, this);
+            } else if (this.chosenProvider == "okta_cup") {
+                this.awsService.authenticateOktaUserPool(idToken, this);
+            }
+        }
+    }
+
+    setChosenProvider(provider: string) {
+        this.chosenProvider = provider;
+    }
+
+    setToken(token: string) {
+        console.log("HomeComponent:setToken(token: string)");
+        this.token = token;
+        localStorage.setItem("token", token);
+    }
+
+    getToken() {
+        console.log("HomeComponent:getToken()");
+        return this.token;
+    }
+
+    clearFields(chosenProvider: string) {
+        console.log("HomeComponent:clearFields(chosenProvider: string)");
+        this.chosenProvider = chosenProvider;
+        console.log(`chosenProvide: ${chosenProvider}`);
+        this.username = "";
+        this.password = "";
+        this.errorMessage = "";
+        this.provider = "";
+        if (chosenProvider == "google") {
+            this.chosenProvider = "";
+            this.disableInput = true;
+            this.disableUserInput = true;
+            this.awsService.getgoogleData(this);
+        } else if (chosenProvider == "okta_cup" || chosenProvider == "okta_cip") {
+            console.log(`chosenProvider: ${chosenProvider}`);
+            console.log(`this.chosenProvider: ${this.chosenProvider}`);
+            this.disableInput = false;
+            this.disableUserInput = true;
+        }
+    }
+
+    enableFields() {
+        console.log("HomeComponent:enableFields()");
+        this.googleUser = null;
+        this.googleConfirmed = "";
+        this.provider = "";
+        this.chosenProvider = "";
+        this.disableInput = false;
+        this.disableUserInput = false;
+    }
+
+    cognitoLogOut() {
+        console.log("HomeComponent:cognitoLogOut()");
+        this.oauthService.logOut();
+    }
+
+    onLogin() {
+        console.log("HomeComponent:onLogin()");
+        if ((this.username != null || this.username != "") &&
+            (this.password != null || this.password != "") &&
+            (this.chosenProvider != null || this.chosenProvider != "")) {
+            this.errorMessage = "";
+        }
+        if (this.disableUserInput != true) {
+            if (this.username == null || this.password == null || this.username == "" || this.password == "") {
+                this.errorMessage = "All fields are required";
+                return;
+            }
+        }
+        if (this.chosenProvider == null || this.chosenProvider == "") {
+            this.errorMessage = "Please select an Identity Provider";
+            return;
+        }
+
+        if (this.chosenProvider == "cup") {
+            console.log("onLogin(): cup")
+            console.log("onLogin(): authenticateUserPool")
+            console.log("onLogin(): username: " + this.username)
+            console.log("onLogin(): password: " + this.password)
+            this.awsService.authenticateUserPool(this.username, this.password, this);
+        } else if (this.chosenProvider == "cip") {
+            console.log("onLogin(): cip")
+            console.log("onLogin(): authenticateIdentityPool")
+            console.log("onLogin(): username: " + this.username)
+            console.log("onLogin(): password: " + this.password)
+            this.awsService.authenticateIdentityPool(this.username, this.password, this);
+        } else if (this.chosenProvider == "okta_cup" || this.chosenProvider == "okta_cip") {
+            console.log("onLogin(): okta_cip || okta_cup")
+            console.log(`this.chosenProvider: "${this.chosenProvider}"`);
+            console.log(`this.username: "${this.username}"`);
+            console.log(`this.password: "${this.password}"`);
+            localStorage.setItem("chosenProvider", this.chosenProvider);
+            //Starts the authorization code flow and redirects to user to the auth servers login url.
+            //Afterwards an event is fired for example token_received
+            //The callbacks are made inside this.oauthService.events:token_received callback function.
+            this.oauthService.initCodeFlow();
+        };
+        this.redError = "";
+        this.success = "";
+        this.loggedInCreds = {
+            accessKey: "",
+            secretKey: "",
+            sessionToken: "",
+            token: ""
+        };
+    }
+
+    get getUserName() {
+        console.log("HomeComponent:getUserName()");
+        const claims = this.oauthService.getIdentityClaims();
+        if (!claims) {
+            return null;
+        }
+        return claims['name'];
+    }
+
+    userDataFromGoogle() {
+        console.log("HomeComponent:userDataFromGoogle()");
+        let authData = this.awsService.getgoogleCreds(this);
+        let authProfile = this.awsService.getgoogleProfile(this);
+        let accessKey = authData.accessKey;
+        let secretKey = authData.secretKey;
+        let sessionToken = authData.sessionToken;
+        let name = authProfile.ofa;
+        let surname = authProfile.wea;
+        let email = authProfile.U3;
+        this.awsService.userInfoApiGoogle(accessKey, secretKey, sessionToken, name, surname, email, this);
+        this.awsService.userInfoApiGoogle(accessKey, secretKey, sessionToken, name, surname, email, this);
+    }
+
+    userDataFromUserPools() {
+        console.log("HomeComponent:userDataFromUserPools()");
+        console.log("token: " + this.token);
+        this.awsService.postInfoApiUserPools(this.token)
+            .subscribe(user => {
+                this.user = user;
+                console.log(user);
+                console.log("POST with JWT to API Gateway");
+            },
+                error => this.errorMessage = <any>error);
+        this.awsService.getInfoApiUserPools(this.token)
+            .subscribe(user => {
+                this.user = user;
+                console.log("GET with JWT to API Gateway");
+            },
+                error => this.errorMessage = <any>error);
+    }
+
+    testGoogle() {
+        console.log("HomeComponent:testGoogle()");
+        this.awsService.getgoogleData(this);
+        this.redError = "";
+        this.success = "";
+        this.awsService.testAccess(this.loggedInCreds, "google", this.awsService.region, this);
+    }
+
+    testUserPools() {
+        console.log("HomeComponent:testUserPools()");
+        this.redError = "";
+        this.success = "";
+        this.awsService.getInfoApiUserPools(this.loggedInCreds.token)
+            .subscribe(user => {
+                this.user = user;
+                this.success = "ACCESS GRANTED!";
+                this.redError = "";
+                console.log("Access to /cup API Resource with current credentials GRANTED");
+            },
+                error => this.redError = <any>error);
+        if (this.redError) {
+            this.success = "";
+        }
+    }
+
+    testIdentityPools() {
+        console.log("HomeComponent:testIdentityPools()");
+        this.redError = "";
+        this.success = "";
+        this.awsService.testAccess(this.loggedInCreds, "cip", this.awsService.region, this);
+    }
+
+    testOkta() {
+        console.log("HomeComponent:testOkta()");
+        this.redError = "";
+        this.success = "";
+        this.awsService.testAccess(this.loggedInCreds, "okta_cip", this.awsService.region, this);
+    }
+
+    cognitoCallback(message: string | null, result: any) {
+        console.log("HomeComponent:cognitoCallback(message: string, result: any)");
+        if (message != null) { // error
+            console.log("cognitoCallback (message: " + message)
+            this.errorMessage = message;
+        } else { // success
+            console.log(", result " + result);
+            this.setToken(result.getIdToken().getJwtToken());
+            this.loggedInCreds.token = this.getToken();
+            this.googleConfirmed = "";
+            this.provider = "Cognito User Pools";
+            this.userDataFromUserPools();
+        }
+    }
+
+    cognitoCallbackWithCreds(message: string | null, result: any, creds: any, data: any) {
+        console.log("HomeComponent:cognitoCallbackWithCreds(message: string, result: any, creds: any, data: any)");
+        if (message != null) { // error
+            this.errorMessage = message;
+        } else { // success
+            this.loggedInCreds.accessKey = creds.accessKey;
+            this.loggedInCreds.secretKey = creds.secretKey;
+            this.loggedInCreds.sessionToken = creds.sessionToken;
+            this.googleConfirmed = "";
+            this.setToken(result);
+            this.provider = "Cognito User and Identity Pools";
+            this.user = data;
+        }
+    }
+    cognitoOktaFederatedUserPoolCallback(message: string | null, token: string | null) {
+        console.log("HomeComponent:cognitoCallback(message: string, result: any)");
+        if (message != null) { // error
+            console.log("cognitoCallback (message: " + message)
+            this.errorMessage = message;
+        } else { // success
+            this.setToken(token!);
+            this.loggedInCreds.token = this.getToken();
+            this.googleConfirmed = "";
+            this.provider = "Okta Cognito User Pools";
+            this.userDataFromUserPools();
+        }
+    }
+
+    cognitoOktaFederatedIdenityPoolCallback(message: string | null, result: any, creds: any, data: any) {
+        console.log("HomeComponent:oktaCallback(message: string, result: any, creds: any, data: any)");
+        if (message != null) { // error
+            this.errorMessage = message;
+        } else { // success
+            //obtain creds
+            // call authenticateOktaIdentityPool
+            this.loggedInCreds.accessKey = creds.accessKey;
+            this.loggedInCreds.secretKey = creds.secretKey;
+            this.loggedInCreds.sessionToken = creds.sessionToken;
+            this.googleConfirmed = "";
+            this.setToken(result);
+            this.provider = "Okta Cognito User and Identity Pools";
+            this.user = data;
+        }
+    }
+
+    googleCallback(creds: any, profile: any) {
+        console.log("HomeComponent:googleCallback(creds: any, profile: any)");
+        console.log(creds);
+        console.log(profile);
+        if (creds != null || profile != null) {
+            if (creds != null) {
+                this.loggedInCreds.accessKey = creds.accessKey;
+                this.loggedInCreds.secretKey = creds.secretKey;
+                this.loggedInCreds.sessionToken = creds.sessionToken;
+                this.googleConfirmed = "confirmed";
+            }
+        }
+    }
+
+    googleCallbackWithData(data: any) {
+        console.log("HomeComponent:googleCallbackWithData(data: any)");
+        this.googleUser = data;
+        this.googleConfirmed = "confirmed";
+    }
+
+    testCallback(result: any, err: any) {
+        console.log("HomeComponent:testCallback(result: any, err: any)");
+        if (result != null) {
+            this.success = "ACCESS GRANTED!";
+            this.redError = "";
+        } else
+            if (err != null) {
+                this.success = "";
+                this.redError = "UNAUTHORIZED!";
+            } else {
+                this.success = "";
+                this.redError = "AUTHORIZED!";
+            }
+    }
+    //Helper Methods for simple configuration
+    private configureCognitoPKCEFlow() {
+        console.log("HomeComponent:configureCognitoPKCEFlow()");
+        this.oauthService.configure(cognitoAuthConfig);
+        this.oauthService.loadDiscoveryDocumentAndTryLogin().then((_) => {
+            if (useHash) {
+                this.router.navigate(['/']);
+            }
+        });
+
+        // Optional
+        this.oauthService.setupAutomaticSilentRefresh();
+    }
+
+    get oktaCognitoRedirect() {
+        console.log("HomeComponent:get oktaCognitoRedirect()");
+        let claims = this.oauthService.getIdentityClaims();
+        return claims ? claims : null;
+    }
+}
+        </code>
+    </pre>
+    <div class="r-stack">
+        <p class="fragment fade-right fade-in-then-out" data-code-focus="145">
+            For the Onlogin method()
+        </p>
+        <p class="fragment fade-in-then-out" data-code-focus="147">
+            First checking some boundary condition
+        </p>
+        <p class="fragment fade-in-then-out" data-code-focus="152">
+            First checking some boundary condition
+        </p>
+        <p class="fragment fade-in-then-out" data-code-focus="158">
+            First checking some boundary condition
+        </p>
+        <p class="fragment fade-in-then-out" data-code-focus="158">
+            Then,
+        </p>
+        <p class="fragment fade-in-then-out" data-code-focus="163">
+            For CUP use case:
+        </p>
+        <p class="fragment fade-in-then-out" data-code-focus="168">
+            Call authenticateUserPool defined in awsService.
+        </p>
+        <p class="fragment fade-in-then-out" data-code-focus="168">
+            Similarly,
+        </p>
+        <p class="fragment fade-in-then-out" data-code-focus="169">
+            For CIP use case:
+        </p>
+        <p class="fragment fade-in-then-out" data-code-focus="174">
+            Call authenticateIdentityPool defined in awsService.
+        </p>
+        <p class="fragment fade-in-then-out" data-code-focus="174">
+            Finally:
+        </p>
+        <p class="fragment fade-in-then-out" data-code-focus="175">
+            For OKTA_CUP and OKTA_CIP .
+        </p>
+        <p class="fragment fade-in-then-out" data-code-focus="184">
+            Initialize and start the code flow to Cognito.
+        </p>
+    </div>
+</section>

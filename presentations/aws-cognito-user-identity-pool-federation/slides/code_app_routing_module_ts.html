@@ -1,0 +1,43 @@
+<section>
+    <h2>Routes</h2>
+    <pre data-cc="false" data-badge="app-routing-module.ts" data-badge-class="demo">
+        <code class="typescript" data-trimdata-noescape>
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { HomeComponent } from "./home/home.component";
+import { CognitoSigninComponent } from "./home/cognito-signin/cognito-signin.component";
+
+import {
+    RouterModule
+    , Routes
+} from '@angular/router';
+
+const routes: Routes = [
+    {
+        path: '',
+        redirectTo: '/demo',
+        pathMatch: 'full'
+    },
+    {
+        path: 'demo',
+        component: HomeComponent,
+    },
+];
+
+@NgModule({
+    imports: [RouterModule.forRoot(routes)],
+    exports: [RouterModule]
+})
+export class AppRoutingModule { }
+        </code>
+        </pre>
+    <div class="r-stack">
+        <p class="fragment fade-in-then-out" data-code-focus="14-16">
+            The root path configured to rediect to
+            /demo context.
+        </p>
+        <p class="fragment fade-in-then-out" data-code-focus="18-20">
+            The /demo path is defined to load to HomeComponent!
+        </p>
+    </div>
+</section>

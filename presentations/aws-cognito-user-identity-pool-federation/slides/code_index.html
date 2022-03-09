@@ -1,0 +1,73 @@
+<section>
+    <div class="r-stack">
+        <p class="fragment fade-in-then-out">
+            The index.html:
+        </p>
+        <p class="fragment fade-in-then-out" data-code-focus="24">
+            Loads: AWS SDK
+        </p>
+        <p class="fragment fade-in-then-out" data-code-focus="38">
+            Loads: "apiGateway-js-sdk/apigClient.js"<br>
+            Javascript Generated SDK code.
+        </p>
+        <p class="fragment fade-in-then-out" data-code-focus="46">
+            The body contains an app-root tag.
+        </p>
+        <p class="fragment fade-in-then-out" data-code-focus="46">
+            This is then defined in the Angular app-component.
+        </p>
+    </div>
+
+    <pre data-cc="false" data-badge="index.html" data-badge-class="demo">
+        <code class="html">
+&lt;!doctype html&gt;
+&lt;html lang=&quot;en&quot;&gt;
+    &lt;head&gt;
+        &lt;meta charset=&quot;utf-8&quot;&gt;
+        &lt;title&gt;AwsCognitoApigwAngularAuth&lt;/title&gt;
+        &lt;base href=&quot;/&quot;&gt;
+        &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
+        &lt;link rel=&quot;icon&quot; type=&quot;image/x-icon&quot; href=&quot;favicon.ico&quot;&gt;
+        &lt;!-- Google Sign-In --&gt;
+        &lt;script src=&quot;https://apis.google.com/js/platform.js&quot; async defer&gt;&lt;/script&gt;
+        &lt;!-- /Google Sign-In --&gt;
+
+        &lt;link rel=&quot;icon&quot; type=&quot;image/x-icon&quot; href=&quot;assets/img/logo.png&quot;&gt;
+
+        &lt;!-- Cognito --&gt;
+        &lt;script src=&quot;assets/js/jsbn.js&quot;&gt;&lt;/script&gt;
+        &lt;script src=&quot;assets/js/jsbn2.js&quot;&gt;&lt;/script&gt;
+        &lt;script src=&quot;https://cdn.rawgit.com/bitwiseshiftleft/sjcl/master/sjcl.js&quot;&gt;&lt;/script&gt;
+        &lt;script src=&quot;https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.15.2/moment.min.js&quot;&gt;&lt;/script&gt;
+        &lt;script src=&quot;https://cdn.rawgit.com/aws/amazon-cognito-identity-js/master/dist/aws-cognito-sdk.min.js&quot;&gt;&lt;/script&gt;
+        &lt;script
+            src=&quot;https://cdn.rawgit.com/aws/amazon-cognito-identity-js/master/dist/amazon-cognito-identity.min.js&quot;&gt;&lt;/script&gt;
+        &lt;script src=&quot;https://sdk.amazonaws.com/js/aws-sdk-2.43.0.min.js&quot;&gt;&lt;/script&gt;
+        &lt;!-- /Cognito --&gt;
+
+        &lt;!-- APIGW --&gt;
+        &lt;script src=&quot;assets/js/apiGateway-js-sdk/lib/axios/dist/axios.standalone.js&quot;&gt;&lt;/script&gt;
+        &lt;script src=&quot;assets/js/apiGateway-js-sdk/lib/CryptoJS/rollups/hmac-sha256.js&quot;&gt;&lt;/script&gt;
+        &lt;script src=&quot;assets/js/apiGateway-js-sdk/lib/CryptoJS/rollups/sha256.js&quot;&gt;&lt;/script&gt;
+        &lt;script src=&quot;assets/js/apiGateway-js-sdk/lib/CryptoJS/components/hmac.js&quot;&gt;&lt;/script&gt;
+        &lt;script src=&quot;assets/js/apiGateway-js-sdk/lib/CryptoJS/components/enc-base64.js&quot;&gt;&lt;/script&gt;
+        &lt;script src=&quot;assets/js/apiGateway-js-sdk/lib/url-template/url-template.js&quot;&gt;&lt;/script&gt;
+        &lt;script src=&quot;assets/js/apiGateway-js-sdk/lib/apiGatewayCore/sigV4Client.js&quot;&gt;&lt;/script&gt;
+        &lt;script src=&quot;assets/js/apiGateway-js-sdk/lib/apiGatewayCore/apiGatewayClient.js&quot;&gt;&lt;/script&gt;
+        &lt;script src=&quot;assets/js/apiGateway-js-sdk/lib/apiGatewayCore/simpleHttpClient.js&quot;&gt;&lt;/script&gt;
+        &lt;script src=&quot;assets/js/apiGateway-js-sdk/lib/apiGatewayCore/utils.js&quot;&gt;&lt;/script&gt;
+        &lt;script src=&quot;assets/js/apiGateway-js-sdk/apigClient.js&quot;&gt;&lt;/script&gt;
+        &lt;!-- /APIGW --&gt;
+
+        &lt;script async defer src=&quot;https://buttons.github.io/buttons.js&quot;&gt;&lt;/script&gt;
+
+    &lt;/head&gt;
+
+    &lt;body&gt;
+        &lt;app-root&gt;Loading...&lt;/app-root&gt;
+    &lt;/body&gt;
+
+&lt;/html&gt;
+        </code>
+    </pre>
+</section>

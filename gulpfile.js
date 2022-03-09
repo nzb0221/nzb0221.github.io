@@ -41,6 +41,7 @@ const babelConfig = {
     ignore: ['node_modules'],
     compact: false,
     extensions: ['.js', '.html'],
+    exclude: 'node_modules/**',
     plugins: [
         'transform-html-import-to-string'
     ],
@@ -79,7 +80,7 @@ gulp.task('js-es5', () => {
         input: 'js/index.js',
         plugins: [
             resolve(),
-            commonjs(),
+            // commonjs(),
             babel(babelConfig),
             terser()
         ]
@@ -102,7 +103,7 @@ gulp.task('js-es6', () => {
         input: 'js/index.js',
         plugins: [
             resolve(),
-            commonjs(),
+            // commonjs(),
             babel(babelConfigESM),
             terser()
         ]
@@ -134,7 +135,7 @@ gulp.task('plugins', () => {
             input: plugin.input,
             plugins: [
                 resolve(),
-                commonjs(),
+                // commonjs(),
                 babel({
                     ...babelConfig,
                     ignore: [/node_modules\/(?!(highlight\.js|marked)\/).*/],
@@ -194,16 +195,16 @@ gulp.task('css-core', () => gulp.src([
     .pipe(header(banner))
     .pipe(gulp.dest('./dist')))
 
-gulp.task('css-chalkboard', () => gulp.src([
-    'node_modules/reveal.js-plugins/chalkboard/style.css',
-])
-    .pipe(compileSass())
-    .pipe(autoprefixer())
-    .pipe(minify({ compatibility: 'ie9' }))
-    .pipe(header(banner))
-    .pipe(gulp.dest('./dist/chalkboard')))
+// gulp.task('css-chalkboard', () => gulp.src([
+//     'node_modules/reveal.js-plugins/chalkboard/style.css',
+// ])
+//     .pipe(compileSass())
+//     .pipe(autoprefixer())
+//     .pipe(minify({ compatibility: 'ie9' }))
+//     .pipe(header(banner))
+//     .pipe(gulp.dest('./dist/chalkboard')))
 
-gulp.task('css', gulp.parallel('css-themes', 'css-core', 'css-chalkboard'))
+gulp.task('css', gulp.parallel('css-themes', 'css-core'))
 
 gulp.task('qunit', () => {
 
@@ -321,7 +322,7 @@ gulp.task('serve', () => {
     gulp.watch([
         'css/*.scss',
         'css/print/*.{sass,scss,css}'
-    ], gulp.series('css-core', 'css-chalkboard', 'reload'))
+    ], gulp.series('css-core', 'reload'))
 
     gulp.watch(['test/*.html'], gulp.series('test'))
 

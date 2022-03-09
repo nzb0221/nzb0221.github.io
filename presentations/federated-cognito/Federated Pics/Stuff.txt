@@ -1,0 +1,225 @@
+* ISSUES
+** Access to XMLHttpRequest at 'https://fqay9esgx2.execute-api.us-east-1.amazonaws.com/prod' from origin 'https://dg2e36ogt04vr.cloudfront.net' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+https://aws.amazon.com/premiumsupport/knowledge-center/no-access-control-allow-origin-error/
+https://advancedweb.hu/how-cloudfront-solves-cors-problems/
+https://advancedweb.hu/how-to-use-api-gateway-with-cloudfront/
+
+CloudFront ---X--->> API Gateway [CORS ENABLED]
+
+
+https://github.com/aws/aws-cdk/commit/f3d5fc98fefdf379f62925bbdf30bb7eecfa0a52
+
+
+* This CDK CLI is not compatible with the CDK library used by your application. Please upgrade the CLI to the latest version.
+
+https://medium.com/aws-architech/tooling-how-to-upgrade-aws-cdk-cli-cf94cc7e0a99
+
+** Unable to resolve AWS account to use. It must be either configured when you define your CDK or through the environment
+
+** For Cloudfront "Compress Objects Automatically" should be No.
+
+
+** Add command line options and implement destroy
+https://github.com/yargs/yargs/blob/master/docs/examples.md
+
+https://walrus.ai/blog/2019/11/typescript-cli/
+
+* Interesting code
+return Promise.reject(new Error('OKTA API getOrigin parameter trustedOriginId is required.'));
+
+* Typescript: Type 'string | undefined' is not assignable to type 'string'
+
+https://www.typescriptlang.org/docs/handbook/release-notes/typescript-2-0.html
+
+* No base href set. Please provide a value for the APP_BASE_HREF token or add a base element to the document.
+    Forgot to update clientID 
+    Attempt to update, rebuild and sync frontend code!
+
+* load failed: error:02001003:system library:fopen:No such process
+
+* TODO fix deployment frontend, issue observed running awscli from  typescript related to python
+* TODO fix deployment
+
+* Checkout Derick Banas https://www.youtube.com/watch?v=_8gHHBlbziw
+
+
+* 2020-10-26T15:53:32.017Z	fece6645-9c13-4b5f-95a9-23e30d8f24b4	INFO	Exception on queue AccessDenied: Access to the resource https://sqs.us-east-1.amazonaws.com/ is denied.
+    at Request.extractError (/var/runtime/node_modules/aws-sdk/lib/protocol/query.js:50:29)
+    at Request.callListeners (/var/runtime/node_modules/aws-sdk/lib/sequential_executor.js:106:20)
+    at Request.emit (/var/runtime/node_modules/aws-sdk/lib/sequential_executor.js:78:10)
+    at Request.emit (/var/runtime/node_modules/aws-sdk/lib/request.js:688:14)
+    at Request.transition (/var/runtime/node_modules/aws-sdk/lib/request.js:22:10)
+    at AcceptorStateMachine.runTo (/var/runtime/node_modules/aws-sdk/lib/state_machine.js:14:12)
+    at /var/runtime/node_modules/aws-sdk/lib/state_machine.js:26:10
+    at Request.<anonymous> (/var/runtime/node_modules/aws-sdk/lib/request.js:38:9)
+    at Request.<anonymous> (/var/runtime/node_modules/aws-sdk/lib/request.js:690:12)
+    at Request.callListeners (/var/runtime/node_modules/aws-sdk/lib/sequential_executor.js:116:18) {
+  code: 'AccessDenied',
+  time: 2020-10-26T15:53:32.013Z,
+  requestId: 'dc5c173f-23a9-5b79-8e9a-4f2fd0927f46',
+  statusCode: 403,
+  retryable: false,
+  retryDelay: 21.45082313634179
+}
+
+* Understand KoFax APi
+http://localhost/mobilesdk/api/AppStats
+
+** Processing PDF documents
+
+* Issue
+[ERROR] TypeError: the JSON object must be str, bytes or bytearray, not NoneType
+Traceback (most recent call last):
+  File "/var/task/lambda_function.py", line 113, in lambda_handler
+    return processRequest(request)
+  File "/var/task/lambda_function.py", line 76, in processRequest
+    opg.run()
+  File "/opt/python/og.py", line 112, in run
+    jsonPolicyDocsAnalysis=txm.run(blocks)
+  File "/opt/python/txm_policydocs_analysis.py", line 195, in run
+    json_object = json.loads(json_data)
+  File "/var/lang/lib/python3.7/json/__init__.py", line 341, in loads
+    raise TypeError(f'the JSON object must be str, bytes or bytearray, '
+[ERROR] TypeError: the JSON object
+
+*
+Piotr Kucharski @Sketusky Aug 14 2019 09:42
+Hello, is it possible to create OAuth2 PKCE server with Spring Security?
+
+Andreas Falk @andifalk Aug 14 2019 13:00
+@Sketusky if you mean creating an OAuth2 authorization server with PKCE support then this feature is planned as part of Spring Security 5.3. See https://github.com/spring-projects/spring-security/milestone/147
+
+https://github.com/spring-projects/spring-security/milestone/147
+https://github.com/spring-projects/spring-security/issues/6881
+
+Interesting: https://spring.io/blog/2020/09/02/hello-azure-spring-cloud
+
+
+* Parser is failing with specific type of document
+** See https://forums.aws.amazon.com/thread.jspa?threadID=328320&tstart=0
+
+Amazon Augmented AI (Amazon A2I) integration with Amazon Textract's Analyze Document [Example]
+https://github.com/aws-samples/amazon-a2i-sample-jupyter-notebooks/blob/master/Amazon%20Augmented%20AI%20(A2I)%20and%20Textract%20AnalyzeDocument.ipynb
+
+
+* ERROR
+404 Not Found
+Code: NoSuchWebsiteConfiguration
+Message: The specified bucket does not have a website configuration
+BucketName: poc-documents-bucket
+RequestId: C0CAA8729D1011C1
+HostId: t7Am3FxL1rR6HXDnTLjTpRzM1Rxvavy/Z1G+Zg3ibWHLDCj5Tcir8t1VtCd1AbD89M9oAhojai4=
+
+Solved issue by changing origin to:
+https://poc-cnwww-policydocs.s3-website-us-east-1.amazonaws.com
+
+
+
+
+
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity E3UWGMQ4QBB4J2"
+            },
+            "Action": [
+                "s3:GetObject*",
+                "s3:GetBucket*",
+                "s3:List*"
+            ],
+            "Resource": [
+                "arn:aws:s3:::poc-cnwww-policydocs",
+                "arn:aws:s3:::poc-cnwww-policydocs/*"
+            ]
+        }
+Must Read:
+        
+https://aws.amazon.com/blogs/networking-and-content-delivery/securing-cloudfront-distributions-using-openid-connect-and-aws-secrets-manager/
+https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-getting-started-hello-world.html
+
+* AWS Cloud Development Kit FAQs
+https://aws.amazon.com/cdk/faqs/#:~:text=AWS%20CDK%20offers%20broad%20coverage,Python%2C%20C%23%2C%20and%20Java.&text=If%20you%20prefer%20defining%20your,SAM%20is%20the%20better%20fit.
+
+
+* Understand Websockets
+https://www.youtube.com/watch?v=uIhIoGacH9o\
+
+
+* ISSUES 11/5/2020
+** Access to XMLHttpRequest at 'https://s48qcgyt1l.execute-api.us-east-1.amazonaws.com/prod' from origin 'https://d2ozp91fdvkykf.cloudfront.net' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+
+** The specified key does not exist
+
+** content-length: 1053
+content-type: text/html
+date: Mon, 09 Nov 2020 01:48:52 GMT
+server: CloudFront
+status: 403
+via: 1.1 2cacac101b02e29f4681db92bacffa85.cloudfront.net (CloudFront)
+x-amz-cf-id: jXsnLxn8ZX4xQAGnsy9OaQbzGuhGXICUyeCjXHKywKsEfg6iuVtyNw==
+x-amz-cf-pop: ATL51-C1
+x-cache: Error from cloudfront
+
+
+Show 29 more frames
+main-es2015.c7755068fb9b7d828f4c.js:1 Error during POST to AWS!!
+main-es2015.c7755068fb9b7d828f4c.js:1 Error Code: 403
+Message: Http failure response for https://d3efgi4hkifuh0.cloudfront.net/prod: 403 OK
+main-es2015.c7755068fb9b7d828f4c.js:1 No issues, I will wait until promise is resolved..
+main-es2015.c7755068fb9b7d828f4c.js:1 Process:::: undefined
+
+
+<Error>
+<Code>NoSuchKey</Code>
+<Message>The specified key does not exist.</Message>
+<Key>callback</Key>
+<RequestId>E70E54BB89F8BFDE</RequestId>
+<HostId>Uf/lkZfpzTCV03XEUey3QV2ry8ADSxtlBDxrHEDLKI9FapzaEOnsqLv1UFTCJVV0BWKGEH4lH9g=</HostId>
+</Error>
+
+
+Response Headers
+Connection: Keep-Alive
+Content-Type: application/xml
+Date: Thu, 19 Nov 2020 19:38:04 GMT
+Server: AmazonS3
+Transfer-Encoding: chunked
+Via: 1.1 a6ee338f3d3ecb97be8107e29130eb27.cloudfront.net (CloudFront)
+X-Amz-Cf-Id: F0JdhbO82x4KgkvUlVxJpFYwXFn1dy-TkQXDdfk3f7MHaTi6ZWKwAQ==
+X-Amz-Cf-Pop: DFW53-C1
+X-Cache: Error from cloudfront
+
+
+curl "https://d2hyvtou9i2zg4.cloudfront.net/callback?code=PEBtNMSoQjwClU_4dXa0lsJUrVMwY_ibnbYbrnt6V3g^&state=OL8l7N4bBO0rhteZfpjjhr4sieNqI5sCOnKQhHUsNYupHHK9j9PKo9ys34BoO0g0" ^
+  -H "authority: d2hyvtou9i2zg4.cloudfront.net" ^
+  -H "pragma: no-cache" ^
+  -H "cache-control: no-cache" ^
+  -H "upgrade-insecure-requests: 1" ^
+  -H "user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.198 Safari/537.36" ^
+  -H "accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9" ^
+  -H "sec-fetch-site: cross-site" ^
+  -H "sec-fetch-mode: navigate" ^
+  -H "sec-fetch-user: ?1" ^
+  -H "sec-fetch-dest: document" ^
+  -H "accept-language: en-US,en;q=0.9" ^
+  -H "cookie: okta-oauth-redirect-params=^{^%^22responseType^%^22:^%^22code^%^22^%^2C^%^22state^%^22:^%^22OL8l7N4bBO0rhteZfpjjhr4sieNqI5sCOnKQhHUsNYupHHK9j9PKo9ys34BoO0g0^%^22^%^2C^%^22nonce^%^22:^%^220M4UtvV6gYcfUhVs34MOMyrVjgV7FjprSRRb9bMYGZLt4phCDQnupN2GllYIoLZz^%^22^%^2C^%^22scopes^%^22:^[^%^22openid^%^22^%^2C^%^22profile^%^22^]^%^2C^%^22clientId^%^22:^%^220oav7r6uo2hBWUJOY0h7^%^22^%^2C^%^22urls^%^22:^{^%^22issuer^%^22:^%^22https://txmonlinestaging.oktapreview.com/oauth2/default^%^22^%^2C^%^22authorizeUrl^%^22:^%^22https://txmonlinestaging.oktapreview.com/oauth2/default/v1/authorize^%^22^%^2C^%^22userinfoUrl^%^22:^%^22https://txmonlinestaging.oktapreview.com/oauth2/default/v1/userinfo^%^22^%^2C^%^22tokenUrl^%^22:^%^22https://txmonlinestaging.oktapreview.com/oauth2/default/v1/token^%^22^%^2C^%^22revokeUrl^%^22:^%^22https://txmonlinestaging.oktapreview.com/oauth2/default/v1/revoke^%^22^%^2C^%^22logoutUrl^%^22:^%^22https://txmonlinestaging.oktapreview.com/oauth2/default/v1/logout^%^22^}^%^2C^%^22ignoreSignature^%^22:false^}; okta-oauth-nonce=0M4UtvV6gYcfUhVs34MOMyrVjgV7FjprSRRb9bMYGZLt4phCDQnupN2GllYIoLZz; okta-oauth-state=OL8l7N4bBO0rhteZfpjjhr4sieNqI5sCOnKQhHUsNYupHHK9j9PKo9ys34BoO0g0" ^
+  --compressed
+
+  Solution: 
+  The endpoint needs to have http in it for okta to work!!
+  Change it to http://poccnwww.policydocs.s3-website-us-east-1.amazonaws.com
+
+Error:
+  EvalError: Refused to evaluate a string as JavaScript because 'unsafe-eval' is not an allowed source of script in the following Content Security Policy directive: "default-src 'self'".
+https://stackoverflow.com/questions/64746730/dynamically-compiled-lazy-loaded-dynamic-routes-in-angular-causing-unsafe-eval
+
+Solution: 
+  
+Error:
+  Uncaught EvalError: Refused to evaluate a string as JavaScript because 'unsafe-eval' is not an allowed source of script in the following Content Security Policy directive: "default-src 'self'".
+
+
+https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP
+
+The self Source List Keyword
+https://content-security-policy.com/self/

@@ -1,0 +1,539 @@
+<section>
+  <div class="r-stack">
+    <p class="fragment fade-in-then-out">
+      The Service that does all the work!
+    </p>
+    <p class="fragment fade-in-then-out">
+      For CUP
+    </p>
+    <p class="fragment fade-right" data-code-focus="151">
+      We have the authenticateUserPool method
+    </p>
+  </div>
+  <pre data-cc="false" data-badge="aws.service.ts" data-badge-class="demo">
+        <code class="typescript">
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
+import { map, Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import * as AWS from 'aws-sdk';
+import { CognitoIdentityCredentials, CognitoIdentity } from 'aws-sdk';
+import * as AWSCognito from 'amazon-cognito-identity-js';
+import loginsMapType = CognitoIdentity.GetIdInput;
+import cognitoIdentityOptions = CognitoIdentityCredentials.CognitoIdentityOptions;
+import { environment } from './../../environments/environment';
+
+import {
+  CognitoUserPool,
+  CognitoUserAttribute,
+  CognitoUser,
+} from 'amazon-cognito-identity-js';
+import { rejects } from 'assert';
+import { AWSError, STS } from 'aws-sdk';
+
+//declare let AWS: any;
+//declare let AWSCognito: any;
+declare let apigClientFactory: any;
+
+export interface Callback {
+  cognitoCallback(message: string, result: any): void;
+  cognitoCallbackWithCreds(message: string, result: any, creds: any, data: any): void;
+  googleCallback(creds: any, profile: any): any;
+  googleCallbackWithData(data: any): any;
+  testCallback(result: any, err: any): any;
+}
+
+@Injectable()
+export class AwsService {
+  token: any;
+  googleCreds: any;
+  googleProfile: any;
+  googleData: any;
+  userData: any;
+
+  /************ RESOURCE IDENTIFIERS *************/
+  googleId: string = '127245450-dikmc3kr9o3og9qdvurcmqdgfd7f8b58.apps.googleusercontent.com';
+  poolData = {
+    UserPoolId: 'us-east-1_UHXlY6nIN', //CognitoUserPool
+    ClientId: '1qot8dqnfiut7rnt2kaot424hn', //CognitoUserPoolClient
+    Paranoia: 7
+  };
+  identityPool: string = 'us-east-1:bd9de6d3-15bd-46dc-be27-c4f0b22e4251'; //CognitoIdentityPool
+  apiURL: string = 'https://s2z9qgpnt9.execute-api.us-east-1.amazonaws.com/demo';  //ApiUrl
+  region: string = environment.region; //Region Matching CognitoUserPool region
+
+  /*********************************************/
+  // https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-browser-credentials-cognito.html
+  constructor(private _http: HttpClient) {
+    AWS.config.update({
+      region: environment.region,
+      credentials: new CognitoIdentityCredentials({
+        IdentityPoolId: ''
+      })
+    });
+
+    AWS.config.region = environment.region;
+    AWS.config.update({ accessKeyId: 'null', secretAccessKey: 'null' });
+  }
+
+  setGoogleCreds(googleCreds: any) {
+    this.googleCreds = googleCreds;
+  }
+
+  getgoogleCreds(callback: any) {
+    callback.googleCallback(this.googleCreds);
+    return this.googleCreds;
+  }
+
+  setGoogleProfile(googleProfile: any) {
+    this.googleProfile = googleProfile;
+  }
+
+  getgoogleProfile(callback: any) {
+    callback.googleCallback(this.googleProfile);
+    return this.googleProfile;
+  }
+
+  getgoogleData(callback: any) {
+    callback.googleCallback(this.googleCreds, this.getgoogleProfile);
+    let googleData = {
+      awsCreds: this.googleCreds,
+      googleProfile: this.getgoogleProfile
+    };
+    return googleData;
+  }
+
+  authenticateGoogle(authResult: any, region: string, profile: any, callback: any) {
+    // Add the Google access token to the Cognito credentials login map.
+    // https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/loading-browser-credentials-cognito.html
+    AWS.config.credentials = new CognitoIdentityCredentials({
+      IdentityPoolId: this.identityPool,
+      Logins: { // optional tokens, used for authenticated login
+        'accounts.google.com': authResult['id_token']
+      }
+    });
+
+    // Obtain AWS credentials
+    AWS.config.getCredentials(function () {
+      // Access AWS resources here.
+      let creds = {
+        accessKey: AWS.config.credentials!.accessKeyId,
+        secretKey: AWS.config.credentials!.secretAccessKey,
+        sessionToken: AWS.config.credentials!.sessionToken
+      };
+      let googleData = {
+        awsCreds: creds,
+        googleProfile: profile
+      };
+      callback.googleCallback(creds, profile);
+    });
+
+  }
+
+  userInfoApiGoogle(accessKey: any, secretKey: any, sessionToken: any, name: any, surname: any, email: any, callback: any) {
+    let body = {
+      name: name,
+      surname: surname,
+      email: email
+    };
+
+    let userData;
+
+    let apigClient = apigClientFactory.newClient({
+      accessKey: accessKey,
+      secretKey: secretKey,
+      sessionToken: sessionToken,
+      region: environment.region // The region where the API is deployed
+    });
+    apigClient.googlePost({}, body, {})
+      .then(function (response: any) {
+        console.log("Send user data to API");
+      }).catch(function (response: any) {
+        console.log(response);
+      });
+    apigClient.googleGet({}, {})
+      .then(function (response: any) {
+        console.log("Retrieve data from API");
+        userData = response.data.Items[0];
+        callback.googleCallbackWithData(userData);
+      }).catch(function (response: any) {
+        console.log(response);
+      });
+  }
+
+  authenticateUserPool(user: string, password: string, callback: any) {
+    console.log('authenticateUserPool(user: string, password: string, callback: any)');
+    let authenticationData = {
+      Username: user,
+      Password: password,
+    };
+    let authenticationDetails = new AWSCognito.AuthenticationDetails(authenticationData);
+    let userPool = new AWSCognito.CognitoUserPool(this.poolData);
+    let userData = {
+      Username: user,
+      Pool: userPool
+    };
+    let cognitoUser = new AWSCognito.CognitoUser(userData);
+
+    cognitoUser.authenticateUser(authenticationDetails, {
+      onSuccess: function (result: any) {
+        let cognitoGetUser = userPool.getCurrentUser();
+        callback.cognitoCallback(null, result);
+        if (cognitoGetUser != null) {
+          cognitoGetUser.getSession(function (err: Error, result: any) {
+            if (result) {
+              console.log("authenticateUserPool (): Authenticated to Cognito User Pools!");
+            } else {
+              console.error("authenticateUserPool(): Authentication failed!");
+              callback.cognitoCallback(err.message, null);
+            }
+          });
+        }
+      },
+      onFailure: function (err: any) {
+        console.error("authenticateUserPool: Authentication failed!!");
+        console.error("typeof: " + typeof err);
+        callback.cognitoCallback(err.message, null);
+      }
+    });
+  }
+
+  getInfoApiUserPools(token: any): Observable<any> {
+    let headers = new HttpHeaders({
+      'Content-Type': 'application/json; charset=utf-8',
+      'Authorization': token
+    });
+    return this._http.get(this.apiURL + "/cup", { headers: headers })
+      .pipe(map((res: any) => {
+        res.Items[0];
+      }))
+      .pipe(catchError(this._serverError));
+
+  }
+
+  postInfoApiUserPools(token: string): Observable<any> {
+    let headers = new HttpHeaders({
+      'Content-Type': 'application/json; charset=utf-8',
+      'Authorization': token
+    });
+    let body = {};
+    return this._http.post(this.apiURL + "/cup", JSON.stringify(body), { headers: headers })
+      .pipe(
+        map((res: any) => {
+          console.log("post response: ")
+          console.log(res);
+          return res;
+        }),
+        catchError(this._serverError));
+  }
+
+  authenticateIdentityPool(user: string, password: string, callback: any) {
+    console.log('authenticateIdentityPool(user: string, password: string, callback: any)');
+    let authenticationData = {
+      Username: user,
+      Password: password,
+    };
+    let authenticationDetails = new AWSCognito.AuthenticationDetails(authenticationData);
+    let userPool = new AWSCognito.CognitoUserPool(this.poolData);
+    let userData = {
+      Username: user,
+      Pool: userPool
+    };
+    let cognitoUser = new AWSCognito.CognitoUser(userData);
+
+    let cognitoParams = {
+      IdentityPoolId: this.identityPool,
+      Logins: {} as { [key: string]: CognitoIdentity.IdentityProviderToken }
+    };
+    let poolId = this.poolData.UserPoolId;
+
+    cognitoUser.authenticateUser(authenticationDetails, {
+      onSuccess: function (result: any) {
+        let cognitoGetUser = userPool.getCurrentUser();
+        if (cognitoGetUser != null) {
+          cognitoGetUser.getSession(function (err: any, result: any) {
+            if (result) {
+              console.log("Authenticated to Cognito User and Identity Pools!");
+              let token = result.getIdToken().getJwtToken();
+              console.log("Cognito JWT token: " + token);
+              cognitoParams.Logins["cognito-idp." + environment.region + ".amazonaws.com/" + poolId] = token;
+              AWS.config.credentials = new CognitoIdentityCredentials(cognitoParams);
+              // Obtain AWS credentials
+
+              AWS.config.getCredentials(function (err) {
+                if (err) {
+                  console.log(err.stack);
+                  // credentials not loaded
+                }
+                else {
+                  // Access AWS resources here.
+                  let creds = {
+                    accessKey: AWS.config.credentials!.accessKeyId,
+                    secretKey: AWS.config.credentials!.secretAccessKey,
+                    sessionToken: AWS.config.credentials!.sessionToken
+                  };
+                  console.log("ACCESSKEYID: " + AWS.config.credentials!.accessKeyId);
+                  console.log("SECRETACCESSKEY: " + AWS.config.credentials!.secretAccessKey);
+                  console.log("SESSIONTOKEN:" + AWS.config.credentials!.sessionToken);
+
+                  let additionalParams = {
+                    headers: {
+                      Authorization: token
+                    }
+                  };
+                  let params = {};
+                  let body = {};
+                  let apigClient = apigClientFactory.newClient({
+                    accessKey: AWS.config.credentials!.accessKeyId,
+                    secretKey: AWS.config.credentials!.secretAccessKey,
+                    sessionToken: AWS.config.credentials!.sessionToken,
+                    region: environment.region // The region where the API is deployed
+                  });
+                  let apigClientJWT = apigClientFactory.newClient();
+                  apigClientJWT.cipInfoGet({}, {}, additionalParams)
+                    .then(function (response: any) {
+                      body = response.data.Item;
+                      console.log("Retrieving User Attributes from User Pool");
+                      if (body != null) {
+                        apigClient.cipPost({}, body, {})
+                          .then(function (response: any) {
+                            console.log("Send user data to API");
+                          }).catch(function (response: any) {
+                            console.log("apigClient.cipPost");
+                            console.log(response);
+                          });
+                      }
+                    }).catch(function (response: any) {
+                      console.log(response);
+                    });
+
+                  var sts = new STS();
+                  sts.getCallerIdentity(params, function (err: AWSError, data) {
+                    if (err) {
+                      console.log(err, err.stack); // an error occurred
+                    }
+                    else console.log(data);           // successful response
+                  });
+
+                  apigClient.cipGet(params, {})
+                    .then(function (response: any) {
+                      console.log("Retrieve data from API");
+                      let data = response.data.Items[0];
+                      callback.cognitoCallbackWithCreds(null, result, creds, data);
+                    }).catch(function (response: any) {
+                      console.log(response);
+                    });
+                }
+              });
+            }
+          });
+        }
+      },
+      onFailure: function (err: any) {
+        callback.cognitoCallbackWithCreds(err.message, null, null, null);
+      }
+    });
+  }
+
+  //TODO FIX and implement correctly using the callback to cognitoOktaFederatedUserPoolCallback
+  authenticateOktaUserPool(token: string, callback: any) {
+    if (token) {
+      console.log("authenticateUserPool (): Authenticated to Cognito User Pools!");
+      callback.cognitoOktaFederatedUserPoolCallback(null, token);
+    } else {
+      console.error("authenticateUserPool(): Authentication failed!");
+      callback.cognitoOktaFederatedUserPoolCallback("authenticateOktaUserPool token is null", null);
+    }
+  }
+
+  authenticateOktaIdentityPool(token: string, callback: any) {
+    console.log('authenticateOktaIdentityPool(token: string, callback: any)');
+    let poolId = this.poolData.UserPoolId;
+    let cognitoParams = {
+      IdentityPoolId: this.identityPool,
+      Logins: {} as { [key: string]: CognitoIdentity.IdentityProviderToken }
+    };
+
+    cognitoParams.Logins["cognito-idp." + environment.region + ".amazonaws.com/" + poolId] = token;
+    AWS.config.credentials = new CognitoIdentityCredentials(cognitoParams);
+
+    // Obtain AWS credentials
+    AWS.config.getCredentials(function (err: AWSError | null) {
+      if (err) {
+        console.log(`getCredentials failed using token: \"${token}\"`);
+        console.error(err.stack);
+        callback.cognitoOktaFederatedIdenityPoolCallback(err.message, null);
+        // credentials not loaded
+      }
+      else {
+        // Access AWS resources here.
+        let creds = {
+          accessKey: AWS.config.credentials!.accessKeyId,
+          secretKey: AWS.config.credentials!.secretAccessKey,
+          sessionToken: AWS.config.credentials!.sessionToken
+        };
+        console.log("ACCESSKEYID: " + AWS.config.credentials!.accessKeyId);
+        console.log("SECRETACCESSKEY: " + AWS.config.credentials!.secretAccessKey);
+        console.log("SESSIONTOKEN:" + AWS.config.credentials!.sessionToken);
+
+        let additionalParams = {
+          headers: {
+            Authorization: token
+          }
+        };
+        let params = {};
+        let body = {};
+        let apigClient = apigClientFactory.newClient({
+          accessKey: AWS.config.credentials!.accessKeyId,
+          secretKey: AWS.config.credentials!.secretAccessKey,
+          sessionToken: AWS.config.credentials!.sessionToken,
+          region: environment.region // The region where the API is deployed
+        });
+        let apigClientJWT = apigClientFactory.newClient();
+        apigClientJWT.cipInfoGet({}, {}, additionalParams)
+          .then(function (response: any) {
+            body = response.data.Item;
+            console.log("Retrieving User Attributes from User Pool");
+            if (body != null) {
+              apigClient.cipPost({}, body, {})
+                .then(function (response: any) {
+                  console.log("Send user data to API");
+                }).catch(function (response: any) {
+                  console.log("apigClient.cipPost");
+                  console.log(response);
+                });
+            }
+          }).catch(function (response: any) {
+            console.log(response);
+            callback.cognitoOktaFederatedIdenityPoolCallback(response.message, null);
+          });
+
+        var sts = new STS();
+        sts.getCallerIdentity(params, function (err: AWSError, data: STS.Types.GetCallerIdentityResponse) {
+          if (err) {
+            console.log(err, err.stack); // an error occurred
+            callback.cognitoOktaFederatedIdenityPoolCallback(err.message, null);
+          }
+          else {
+            console.log(data);           // successful response
+          }
+        });
+
+        apigClient.cipGet(params, {})
+          .then(function (response: any) {
+            console.log("Retrieve data from API");
+            let data = response.data.Items[0];
+            callback.cognitoOktaFederatedIdenityPoolCallback(null, token, creds, data);
+          }).catch(function (response: any) {
+            console.log(response);
+            callback.cognitoOktaFederatedIdenityPoolCallback(response.message, null);
+          });
+      }
+    });
+  }
+
+  testAccess(data: any, provider: string, callback: any) {
+    let apigClient = apigClientFactory.newClient({
+      accessKey: data.accessKey,
+      secretKey: data.secretKey,
+      sessionToken: data.sessionToken,
+      region: environment.region // The region where the API is deployed
+    });
+    console.log("testAccess()");
+    console.log("sessionToken: \"" + data.sessionToken + "\"");
+
+    if (provider == "google") {
+      apigClient.googleGet({}, {})
+        .then(function (response: any) {
+          console.log(response);
+          console.log("Access to /google API Resource with current credentials GRANTED");
+          callback.testCallback(response, null);
+        }).catch(function (response: any) {
+          console.log(response);
+          console.log("Access to /google API Resource with current credentials DENIED");
+          callback.testCallback(null, response);
+        });
+    }
+
+    if (provider == "cup") {
+      let apigClient = apigClientFactory.newClient();
+      let additionalParams = {
+        headers: {
+          Authorization: data.token
+        }
+      };
+      apigClient.cupGet({}, {})
+        .then(function (response: any) {
+          console.log(response);
+          console.log("Access to /cup API Resource with current credentials GRANTED");
+          callback.testCallback(response, null);
+        }).catch(function (response: any) {
+          console.log(response);
+          console.log("Access to /cup API Resource with current credentials DENIED");
+          callback.testCallback(null, response);
+        });
+    }
+
+    if (provider == "cip") {
+      apigClient.cipGet({}, {})
+        .then(function (response: any) {
+          console.log(response);
+          console.log("Access to /cip API Resource with current credentials GRANTED");
+          callback.testCallback(response, null);
+        }).catch(function (response: any) {
+          console.log(response);
+          console.log("Access to /cip API Resource with current credentials DENIED");
+          callback.testCallback(null, response);
+        });
+    }
+  }
+
+  private _serverError(err: any) {
+    console.error("Error:" + err)
+    console.error(err);
+    if (err.status === 0) {
+      return throwError('UNAUTHORIZED!!!');
+    }
+    if (err instanceof Response) {
+      console.error(err);
+      return throwError('Backend Server Error');
+    }
+    return throwError('Error');
+  }
+
+  private configureAWS() {
+    // return a promise so you can wait for this to complete
+    return new Promise((resolve, reject) => {
+      AWS.config.getCredentials(function (err) {
+        if (err) {
+          console.log("Error when getting AWS credentials", err.stack);
+          reject(err);
+        }
+        else {
+          const accessKeyId = AWS.config.credentials!.accessKeyId
+          console.log("Access key:", accessKeyId);
+          resolve(accessKeyId)
+        }
+      });
+    })
+  }
+}
+
+        </code>
+    </pre>
+  <div class="r-stack">
+    <p class="fragment fade-in-then-out" data-code-focus="157">
+      First we need to setup an AuthenticationDetails.
+    </p>
+    <p class="fragment fade-in-then-out" data-code-focus="163">
+      Then also an AWSCognito.CognitoUser which is made up from UserData instance.
+    </p>
+    <p class="fragment fade-in-then-out" data-code-focus="165">
+      Using the AWSCognito.CognitoUser we can now authenticate to Cognito UserPool.
+    </p>
+    <p class="fragment fade-in-then-out" data-code-focus="168">
+      If call is succesful we use a calllback method to the
+      so we can save the results, which is basically the Cognito JWT Token.
+    </p>
+  </div>
+</section>

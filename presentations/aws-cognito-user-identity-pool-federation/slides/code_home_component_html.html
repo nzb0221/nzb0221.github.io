@@ -1,0 +1,347 @@
+<section>
+    <h3>Finally the Home Component!</h3>
+    <pre data-cc="false" data-badge="home-component.html" data-badge-class="demo">
+        <code class="html">
+&lt;link href=&quot;https://fonts.googleapis.com/icon?family=Material+Icons&quot; rel=&quot;stylesheet&quot;&gt;
+&lt;br&gt;
+&lt;mat-toolbar color=&quot;accent&quot;&gt;
+    &lt;mat-toolbar-row&gt;
+        &lt;table cellspacing=&quot;0&quot;&gt;
+            &lt;tr&gt;
+                &lt;td&gt;&lt;a href=&quot;https://aws.amazon.com/cognito/&quot; target=&quot;_blank&quot;&gt;&lt;img title=&quot;Amazon Cognito&quot;
+                            src=&quot;../../assets/img/cognito.png&quot;&gt;&lt;/a&gt;
+                    &lt;a href=&quot;https://aws.amazon.com/api-gateway/&quot; target=&quot;_blank&quot;&gt;&lt;img title=&quot;Amazon API Gateway&quot;
+                            src=&quot;../../assets/img/apigw.png&quot;&gt;&lt;/a&gt;
+                &lt;/td&gt;
+            &lt;/tr&gt;
+        &lt;/table&gt;
+        &lt;span&gt;Understanding Authentication Mechanisms for AWS Cognito&lt;/span&gt;
+        &lt;span&gt;&lt;img title=&quot;Amazon Web Services&quot; src=&quot;../../assets/img/aws.png&quot;&gt;&lt;/span&gt;
+    &lt;/mat-toolbar-row&gt;
+&lt;/mat-toolbar&gt;
+
+&lt;mat-grid-list cols=&quot;8&quot; rowHeight=&quot;75px&quot; gutterSize=&quot;5px&quot;&gt;
+    &lt;mat-grid-tile colspan=&quot;3&quot; rowspan=&quot;1&quot; rowHeight=&quot;30px&quot; class=&quot;center&quot;&gt;&lt;i class=&quot;material-icons&quot;&gt;looks_one&lt;/i&gt;&lt;span&gt;
+            Login with your IdP Credentials&lt;/span&gt;
+    &lt;/mat-grid-tile&gt;
+    &lt;mat-grid-tile colspan=&quot;2&quot; rowspan=&quot;1&quot; rowHeight=&quot;30px&quot; class=&quot;center&quot;&gt;&lt;i class=&quot;material-icons&quot;&gt;looks_two&lt;/i&gt;&lt;span&gt;
+            Retrieve User Info&lt;/span&gt;
+    &lt;/mat-grid-tile&gt;
+    &lt;mat-grid-tile colspan=&quot;1&quot; rowspan=&quot;1&quot; rowHeight=&quot;30px&quot; class=&quot;center&quot;&gt;&lt;i class=&quot;material-icons&quot;&gt;looks_3&lt;/i&gt;&lt;span&gt;
+            Test Access&lt;/span&gt;
+    &lt;/mat-grid-tile&gt;
+    &lt;mat-grid-tile colspan=&quot;2&quot; rowspan=&quot;1&quot; rowHeight=&quot;30px&quot; class=&quot;center&quot;&gt;&lt;i class=&quot;material-icons&quot;&gt;looks_4&lt;/i&gt;&lt;span&gt;
+            Verify Auth Results&lt;/span&gt;
+    &lt;/mat-grid-tile&gt;
+&lt;/mat-grid-list&gt;
+
+&lt;mat-grid-list cols=&quot;8&quot; rowHeight=&quot;500px&quot; gutterSize=&quot;5px&quot;&gt;
+
+    &lt;mat-grid-tile id=&quot;login&quot; colspan=&quot;3&quot; rowspan=&quot;1&quot;&gt;
+        &lt;div class=&quot;container&quot;&gt;
+            &lt;mat-card class=&quot;card-container&quot;&gt;
+                &lt;mat-card-header&gt;&lt;/mat-card-header&gt;
+                &lt;mat-card-content&gt;
+                    &lt;form method=&quot;POST&quot;&gt;
+                        &lt;div *ngIf=&quot;!disableUserInput&quot;&gt;
+                            &lt;mat-form-field class=&quot;full-width&quot;&gt;
+                                &lt;mat-label for=&quot;userinput&quot;&gt;User Name&lt;/mat-label&gt;
+                                &lt;textarea matInput id=&quot;userinput&quot; placeholder=&quot;User Name&quot; type=&quot;text&quot;
+                                    [(ngModel)]=&quot;username&quot; [ngModelOptions]=&quot;{standalone: true}&quot;&gt;&lt;/textarea&gt;
+                            &lt;/mat-form-field&gt;
+                            &lt;br&gt;
+                            &lt;mat-form-field class=&quot;full-width&quot;&gt;
+                                &lt;mat-label for=&quot;passinput&quot;&gt;Password&lt;/mat-label&gt;
+                                &lt;textarea matInput id=&quot;passinput&quot; placeholder=&quot;Password&quot; type=&quot;password&quot;
+                                    [(ngModel)]=&quot;password&quot; [ngModelOptions]=&quot;{standalone: true}&quot;&gt;&lt;/textarea&gt;
+                            &lt;/mat-form-field&gt;
+                        &lt;/div&gt;
+                        &lt;mat-radio-group class=&quot;radio-group&quot; [(ngModel)]=&quot;chosenProvider&quot;
+                            [ngModelOptions]=&quot;{standalone: true}&quot;&gt;
+                            &lt;mat-radio-button class=&quot;radio-button&quot; value=&quot;cup&quot; (click)=&quot;enableFields()&quot;&gt;Cognito User
+                                Pools
+                                Standalone (CUP)
+                            &lt;/mat-radio-button&gt;
+                            &lt;mat-radio-button class=&quot;radio-button&quot; value=&quot;cip&quot; (click)=&quot;enableFields()&quot;&gt;Cognito User
+                                Pools with
+                                Identity (CIP)
+                            &lt;/mat-radio-button&gt;
+                            &lt;mat-radio-button class=&quot;radio-button&quot; value=&quot;okta_cup&quot; (click)=&quot;clearFields(&#39;okta_cup&#39;)&quot;&gt;
+                                Okta (CUP)
+                            &lt;/mat-radio-button&gt;
+                            &lt;mat-radio-button class=&quot;radio-button&quot; value=&quot;okta_cip&quot; (click)=&quot;clearFields(&#39;okta_cip&#39;)&quot;&gt;
+                                Okta (CIP)
+                            &lt;/mat-radio-button&gt;
+                            &lt;google-signin value=&quot;google&quot; (click)=&quot;clearFields(&#39;google&#39;)&quot;&gt;&lt;/google-signin&gt;
+                        &lt;/mat-radio-group&gt;
+                    &lt;/form&gt;
+                &lt;/mat-card-content&gt;
+                &lt;div *ngIf=&quot;!disableInput&quot;&gt;
+                    &lt;mat-card-actions&gt;
+                        &lt;button mat-raised-button color=&quot;accent&quot; (click)=&quot;onLogin()&quot; type=&quot;submit&quot;&gt;
+                            Login
+                        &lt;/button&gt;
+                    &lt;/mat-card-actions&gt;
+                &lt;/div&gt;
+            &lt;/mat-card&gt;
+            &lt;br&gt;
+            &lt;div *ngIf=&quot;errorMessage!==null;&quot;&gt;
+                &lt;div class=&quot;error&quot;&gt;
+                    &lt;mat-chip-list color=&quot;warn&quot; disabled&gt;
+                        &lt;mat-chip class=&quot;error&quot; color=&quot;warn&quot; disabled&gt;
+                            &lt;strong&gt;{{errorMessage}}&lt;/strong&gt;
+                        &lt;/mat-chip&gt;
+                    &lt;/mat-chip-list&gt;
+                &lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/mat-grid-tile&gt;
+
+    &lt;mat-grid-tile id=&quot;userDetails&quot; colspan=&quot;2&quot; rowspan=&quot;1&quot;&gt;
+        &lt;div *ngIf=&quot;provider!=null &amp;&amp; provider!=&#39;&#39; ; else notLoggedIn&quot; class=&quot;container&quot;&gt;
+            &lt;mat-card class=&quot;card-container&quot;&gt;
+                &lt;mat-card-header&gt;
+                    &lt;div mat-card-avatar class=&quot;card-header-image&quot;&gt;&lt;/div&gt;
+                    &lt;mat-card-title&gt;
+                        &lt;strong class=&quot;card-header-title&quot;&gt;Authenticated with {{provider}}&lt;/strong&gt;
+                    &lt;/mat-card-title&gt;
+                    &lt;mat-card-subtitle&gt;
+                        &lt;small&gt; Powered by Amazon Cognito and Amazon API Gateway&lt;/small&gt;
+                    &lt;/mat-card-subtitle&gt;
+                &lt;/mat-card-header&gt;
+                &lt;hr&gt;
+                &lt;mat-card-content&gt;
+                    &lt;br&gt;
+                    &lt;div *ngIf=&quot;googleConfirmed==&#39;confirmed&#39;&quot;&gt;
+                        &lt;div *ngIf=&quot;googleUser==null || googleUser==&#39;&#39; ; else googleUserData&quot;&gt;
+                            &lt;br&gt;
+                            &lt;button mat-raised-button color=&quot;warn&quot; (click)=&quot;userDataFromGoogle()&quot; type=&quot;submit&quot;&gt;
+                                Retrieve User Info
+                            &lt;/button&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                    &lt;div *ngIf=&quot;googleConfirmed==null &amp;&amp; user!=null &amp;&amp; user!=&#39;&#39;&quot;&gt;
+                        &lt;div&gt;
+                            &lt;mat-chip-list&gt;
+                                &lt;mat-chip&gt;
+                                    &lt;br&gt;
+                                    &lt;br&gt;
+                                    &lt;strong&gt;{{user.name}} {{user.surname}}&lt;/strong&gt;&lt;br&gt;
+                                    &lt;small&gt;&lt;strong&gt;Email: &lt;/strong&gt;&lt;/small&gt;&lt;span&gt;{{user.email}}&lt;/span&gt;&lt;br&gt;
+                                    &lt;small&gt;&lt;strong&gt;Id: &lt;/strong&gt;&lt;/small&gt;&lt;span&gt;&lt;small&gt;
+                                            &lt;font color=&quot;blue&quot;&gt;{{user.userId}}&lt;/font&gt;
+                                        &lt;/small&gt;&lt;/span&gt;&lt;br&gt;
+                                    &lt;br&gt;
+                                    &lt;br&gt;
+                                    &lt;br&gt;
+                                &lt;/mat-chip&gt;
+                            &lt;/mat-chip-list&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/mat-card-content&gt;
+            &lt;/mat-card&gt;
+        &lt;/div&gt;
+    &lt;/mat-grid-tile&gt;
+
+    &lt;mat-grid-tile id=&quot;buttons&quot; colspan=&quot;1&quot; rowspan=&quot;1&quot;&gt;
+        &lt;div class=&quot;container&quot;&gt;
+            &lt;mat-card class=&quot;card-container&quot;&gt;
+                &lt;mat-card-header&gt;
+                    &lt;mat-card-title&gt;
+                        &lt;strong class=&quot;card-header-title&quot;&gt;API Resources&lt;/strong&gt;
+                    &lt;/mat-card-title&gt;
+                    &lt;mat-card-subtitle&gt;
+                        &lt;small&gt; Endpoint Paths&lt;/small&gt;
+                    &lt;/mat-card-subtitle&gt;
+                &lt;/mat-card-header&gt;
+                &lt;hr&gt;
+                &lt;mat-card-content&gt;
+                    &lt;div *ngIf=&quot;provider!=null &amp;&amp; provider!=&#39;&#39;; else disableTests&quot;&gt;
+                        &lt;div class=&quot;center&quot;&gt;
+                            &lt;button mat-fab (click)=&quot;testUserPools()&quot; type=&quot;submit&quot;&gt;/cup&lt;/button&gt;&lt;br&gt;&lt;br&gt;
+                            &lt;button mat-fab (click)=&quot;testIdentityPools()&quot; type=&quot;submit&quot;&gt;/cip&lt;/button&gt;&lt;br&gt;&lt;br&gt;
+                            &lt;button mat-fab (click)=&quot;testGoogle()&quot; type=&quot;submit&quot;&gt;/google&lt;/button&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/mat-card-content&gt;
+            &lt;/mat-card&gt;
+        &lt;/div&gt;
+    &lt;/mat-grid-tile&gt;
+
+    &lt;mat-grid-tile id=&quot;semaphore&quot; colspan=&quot;2&quot; rowspan=&quot;1&quot;&gt;
+        &lt;div class=&quot;container&quot;&gt;
+            &lt;mat-card class=&quot;card-container&quot;&gt;
+                &lt;mat-card-header&gt;
+                    &lt;div class=&quot;center&quot;&gt;
+                        &lt;mat-card-title&gt;
+                            &lt;span&gt;&lt;strong&gt;
+                                    &lt;font color=&quot;green&quot;&gt;Green: &lt;/font&gt; Good!
+                                &lt;/strong&gt; &lt;i class=&quot;material-icons&quot;&gt;thumb_up&lt;/i&gt;&lt;/span&gt;&lt;br&gt;
+                            &lt;span&gt;&lt;strong&gt;
+                                    &lt;font color=&quot;red&quot;&gt;Red: &lt;/font&gt; Bad!
+                                &lt;/strong&gt; &lt;i class=&quot;material-icons&quot;&gt;thumb_down&lt;/i&gt;&lt;/span&gt;
+                            &lt;br&gt;
+                            &lt;br&gt;
+                        &lt;/mat-card-title&gt;
+                    &lt;/div&gt;
+                &lt;/mat-card-header&gt;
+                &lt;hr&gt;
+                &lt;mat-card-content&gt;
+                    &lt;div class=&quot;center&quot;&gt;
+                        &lt;br&gt;
+                        &lt;br&gt;
+                        &lt;div class=&quot;center&quot;&gt;
+                            &lt;table class=&quot;table&quot;&gt;
+                                &lt;tr class=&quot;card-background&quot;&gt;
+                                    &lt;td&gt;
+                                        &lt;div *ngIf=&quot;success!=&#39;&#39;; else grayCircle&quot;&gt;
+                                            &lt;figure class=&quot;green-circle&quot;&gt;&lt;/figure&gt;
+                                        &lt;/div&gt;
+                                    &lt;/td&gt;
+                                    &lt;td&gt;
+                                        &lt;div *ngIf=&quot;redError!=null &amp;&amp; redError!=&#39;&#39;; else grayCircle&quot;&gt;
+                                            &lt;figure class=&quot;red-circle&quot;&gt;&lt;/figure&gt;
+                                        &lt;/div&gt;
+                                    &lt;/td&gt;
+                                &lt;/tr&gt;
+                            &lt;/table&gt;
+                            &lt;div *ngIf=&quot;redError!=&#39;&#39;; else br&quot;&gt;
+                                &lt;mat-chip-list color=&quot;warn&quot; disabled&gt;
+                                    &lt;mat-chip class=&quot;error&quot; color=&quot;warn&quot; disabled&gt;
+                                        &lt;strong&gt;{{redError}}&lt;/strong&gt;
+                                    &lt;/mat-chip&gt;
+                                &lt;/mat-chip-list&gt;
+                            &lt;/div&gt;
+                            &lt;div *ngIf=&quot;success!=&#39;&#39;; else br&quot;&gt;
+                                &lt;mat-chip-list color=&quot;warn&quot; disabled&gt;
+                                    &lt;mat-chip class=&quot;error&quot; color=&quot;warn&quot; disabled&gt;
+                                        &lt;strong&gt;{{success}}&lt;/strong&gt;
+                                    &lt;/mat-chip&gt;
+                                &lt;/mat-chip-list&gt;
+                            &lt;/div&gt;
+                        &lt;/div&gt;
+                    &lt;/div&gt;
+                &lt;/mat-card-content&gt;
+            &lt;/mat-card&gt;
+        &lt;/div&gt;
+    &lt;/mat-grid-tile&gt;
+
+&lt;/mat-grid-list&gt;
+
+&lt;ng-template #blank&gt;&lt;/ng-template&gt;
+
+&lt;ng-template #disabled&gt;
+    &lt;mat-form-field class=&quot;full-width&quot;&gt;
+        &lt;font color=&quot;gray&quot;&gt;User Name (Disabled for Google Login)&lt;/font&gt;
+        &lt;input mdInput disabled id=&quot;userinput&quot; placehoder=&quot;User Name&quot; type=&quot;text&quot; [(ngModel)]=&quot;username&quot;
+            [ngModelOptions]=&quot;{standalone: true}&quot;&gt;
+    &lt;/mat-form-field&gt;
+    &lt;br&gt;
+    &lt;mat-form-field class=&quot;full-width&quot;&gt;
+        &lt;font color=&quot;gray&quot;&gt;Password (Disabled for Google Login)&lt;/font&gt;
+        &lt;input mdInput disabled id=&quot;passinput&quot; placehoder=&quot;Password&quot; type=&quot;password&quot; required [(ngModel)]=&quot;password&quot;
+            [ngModelOptions]=&quot;{standalone: true}&quot;&gt;
+    &lt;/mat-form-field&gt;
+
+    &lt;div class=&quot;center&quot;&gt;
+        &lt;img title=&quot;Google Plus Sign In&quot; src=&quot;../../assets/img/googleplus.png&quot; width=&quot;125&quot; height=&quot;125&quot;&gt;
+    &lt;/div&gt;
+&lt;/ng-template&gt;
+
+&lt;ng-template #notLoggedIn&gt;
+    &lt;div class=&quot;container&quot;&gt;
+        &lt;mat-card class=&quot;card-container&quot;&gt;
+            &lt;mat-card-header mat-colors=&quot;accent&quot;&gt;
+                &lt;div mat-card-avatar class=&quot;card-header-image&quot;&gt;&lt;/div&gt;
+                &lt;mat-card-title&gt;
+                    &lt;strong class=&quot;card-header-title&quot;&gt;Not Authenticated&lt;/strong&gt;
+                &lt;/mat-card-title&gt;
+                &lt;mat-card-subtitle&gt;
+                    &lt;small&gt; Powered by Amazon Cognito and Amazon API Gateway&lt;/small&gt;
+                &lt;/mat-card-subtitle&gt;
+            &lt;/mat-card-header&gt;
+            &lt;hr&gt;
+            &lt;mat-card-content&gt;
+                &lt;br&gt;
+                &lt;br&gt;
+                &lt;br&gt;
+                &lt;div class=&quot;card-content&quot;&gt;
+                    &lt;mat-chip-list&gt;
+                        &lt;mat-chip&gt;Chose your Provider on the Left and Sign In to retrieve information about the User
+                        &lt;/mat-chip&gt;
+                    &lt;/mat-chip-list&gt;
+                &lt;/div&gt;
+                &lt;br&gt;
+                &lt;br&gt;
+                &lt;br&gt;
+                &lt;br&gt;
+                &lt;br&gt;
+                &lt;br&gt;
+            &lt;/mat-card-content&gt;
+        &lt;/mat-card&gt;
+    &lt;/div&gt;
+&lt;/ng-template&gt;
+
+&lt;ng-template #googleUserData&gt;
+    &lt;div&gt;
+        &lt;mat-chip-list&gt;
+            &lt;mat-chip&gt;
+                &lt;br&gt;
+                &lt;br&gt;
+                &lt;strong&gt;{{googleUser.name}} {{googleUser.surname}}&lt;/strong&gt;&lt;br&gt;
+                &lt;small&gt;&lt;strong&gt;Email: &lt;/strong&gt;&lt;/small&gt;&lt;span&gt;{{googleUser.email}}&lt;/span&gt;&lt;br&gt;
+                &lt;small&gt;&lt;strong&gt;Id: &lt;/strong&gt;&lt;/small&gt;&lt;span&gt;&lt;small&gt;
+                        &lt;font color=&quot;blue&quot;&gt;{{googleUser.userId}}&lt;/font&gt;
+                    &lt;/small&gt;&lt;/span&gt;&lt;br&gt;
+                &lt;br&gt;
+                &lt;br&gt;
+                &lt;br&gt;
+            &lt;/mat-chip&gt;
+        &lt;/mat-chip-list&gt;
+    &lt;/div&gt;
+
+&lt;/ng-template&gt;
+
+&lt;ng-template #disableTests&gt;
+    &lt;div class=&quot;center&quot;&gt;
+        &lt;button mat-fab disabled type=&quot;submit&quot;&gt;/cup&lt;/button&gt;&lt;br&gt;&lt;br&gt;
+        &lt;button mat-fab disabled type=&quot;submit&quot;&gt;/cip&lt;/button&gt;&lt;br&gt;&lt;br&gt;
+        &lt;button mat-fab disabled type=&quot;submit&quot;&gt;/google&lt;/button&gt;
+    &lt;/div&gt;
+&lt;/ng-template&gt;
+
+&lt;ng-template #grayCircle&gt;
+    &lt;figure class=&quot;circle&quot;&gt;&lt;/figure&gt;
+&lt;/ng-template&gt;
+
+&lt;ng-template #br&gt;&lt;/ng-template&gt;
+&lt;router-outlet&gt;&lt;/router-outlet&gt;
+
+        </code>
+    </pre>
+    <div class="r-stack">
+        <p class="fragment fade-in-then-out">
+            When the login button is clicked!
+        </p>
+        <p class="fragment fade-in-then-out" data-code-focus="78">
+            The onLogin() method is called.
+        </p>
+        <p class="fragment fade-in" data-code-focus="158">
+            After authetication, when a specific test is invoked.
+        </p>
+    </div>
+    <p class="fragment fade-in-then-out" data-code-focus="158" style="text-align:left;">
+        either: testUserPools() or testIdentityPools() or testGoogle() method is called!
+    </p>
+    <p class="fragment fade-in-then-out" data-code-focus="159" style="text-align:left;">
+        either: testUserPools() or testIdentityPools() or testGoogle() method is called!
+    </p>
+    <p class="fragment fade-in-then-out" data-code-focus="160" style="text-align:left;">
+        either: testUserPools() or testIdentityPools() or testGoogle() method is called!
+    </p>
+    <p class="fragment fade-in-then-out" data-code-focus="78">
+        Let's visit the onLogin() method.
+    </p>
+    </div>
+
+</section>

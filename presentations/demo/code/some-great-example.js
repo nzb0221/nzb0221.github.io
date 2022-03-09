@@ -1,0 +1,1 @@
+console.log("some great example.")|| "Bye World";

@@ -1,0 +1,3 @@
+On page https://docs.aws.amazon.com/cognito/latest/developerguide/token-endpoint.html
+
+does it support jwt_bearer client_credentials grant

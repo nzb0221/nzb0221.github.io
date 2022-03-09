@@ -1,0 +1,55 @@
+https://developer.atlassian.com/cloud/jira/platform/user-impersonation-for-connect-apps/
+https://www.ge.com/digital/documentation/predix-services/IYzlkY2IzOTYtZGZjZi00NjM3LWJkZjktNmI0NWQzZjU0YWFh.html
+Obtaining Tokens Using JWT Bearer Token Grant
+
+
+
+
+<POST http://auth-server:9000/uaa/oauth/token,{grant_type=[urn:ietf:params:oauth:grant-type:jwt-bearer], assertion=[eyJhbGciOiJSUzI1NiIsImprdSI6Imh0dHBzOi8vbG9jYWxob3N0OjgwODAvdWFhL3Rva2VuX2tleXMiLCJraWQiOiJrZXktaWQtMSIsInR5cCI6IkpXVCJ9.
+
+$ curl 'http://localhost/oauth/token' -i -X POST \
+    -H 'Accept: application/json' \
+    -H 'Content-Type: application/x-www-form-urlencoded' \
+    -d 'client_id=unngbr75hug5&client_secret=secret&grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&token_format=opaque&response_type=token+id_token&scope=openid&assertion=eyJhbGciOiJIUzI1NiIsImprdSI6Imh0dHBzOi8vbG9jYWxob3N0OjgwODAvdWFhL3Rva2VuX2tleXMiLCJraWQiOiJsZWdhY3ktdG9rZW4ta2V5IiwidHlwIjoiSldUIn0.
+    
+    eyJzdWIiOiI5YTUzMzc2ZS1jYjUxLTQzN2ItOTgxMi1iMzBmNzc2MjhlYzgiLCJhdWQiOlsiQU8zZFEzNC1QVVg3Il0sImlzcyI6Imh0dHA6Ly90eGcwYmx3a2pod3kubG9jYWxob3N0OjgwODAvdWFhL29hdXRoL3Rva2VuIiwiZXhwIjoxNjE4MDM1NTg4LCJpYXQiOjE2MTc5OTIzODgsImFtciI6WyJwd2QiXSwiYXpwIjoiQU8zZFEzNC1QVVg3Iiwic2NvcGUiOlsib3BlbmlkIl0sImVtYWlsIjoiZTc2YWNyd20tdXdwQHRlc3Qub3JnIiwiemlkIjoidHhnMGJsd2tqaHd5Iiwib3JpZ2luIjoidWFhIiwianRpIjoiNDRiYjdjYzhlNzBkNDZlNjhkNGIwN2E3ZWM5NTVkYWUiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiY2xpZW50X2lkIjoiQU8zZFEzNC1QVVg3IiwiY2lkIjoiQU8zZFEzNC1QVVg3IiwiZ3JhbnRfdHlwZSI6InBhc3N3b3JkIiwidXNlcl9uYW1lIjoiZTc2YWNyd20tdXdwIiwicmV2X3NpZyI6IjdmNDI3ZWQiLCJ1c2VyX2lkIjoiOWE1MzM3NmUtY2I1MS00MzdiLTk4MTItYjMwZjc3NjI4ZWM4IiwiYXV0aF90aW1lIjoxNjE3OTkyMzg4fQ.ybzzFUxBdhqD_HlMZhZV17Pqbmq62hzTO4UBHDUiK_I'
+
+
+eyJqdGkiOiI0MTUwZDA3ZWFkNTI0ZTZjOGE1YTg2YjhiMjVhZjBmNiIsInN1YiI6IjAxZDVhNDIxLTc5ZWUtNGRhMC05YTAzLTM1NmU4YzEyMDgxOCIsInNjb3BlIjpbImF1dGhvcml0eS1iIiwiYXV0aG9yaXR5LWEiXSwiY2xpZW50X2lkIjoiY2xpZW50LWFiIiwiY2lkIjoiY2xpZW50LWFiIiwiYXpwIjoiY2xpZW50LWFiIiwiZ3JhbnRfdHlwZSI6ImF1dGhvcml6YXRpb25fY29kZSIsInVzZXJfaWQiOiIwMWQ1YTQyMS03OWVlLTRkYTAtOWEwMy0zNTZlOGMxMjA4MTgiLCJvcmlnaW4iOiJ1YWEiLCJ1c2VyX25hbWUiOiJ1c2VyMSIsImVtYWlsIjoidXNlcjFAZXhhbXBsZS5jb20iLCJhdXRoX3RpbWUiOjE2MTg3NTQ1NDEsInJldl9zaWciOiJmYWU1NWY3OCIsImlhdCI6MTYxODc1NDU1MCwiZXhwIjoxNjE4Nzk3NzUwLCJpc3MiOiJodHRwOi8vYXV0aC1zZXJ2ZXI6OTAwMC91YWEvb2F1dGgvdG9rZW4iLCJ6aWQiOiJ1YWEiLCJhdWQiOlsiY2xpZW50LWFiIl19.be5V268CnlbdZLr8xGqpfEUi-jIOn2py4tBmvzQrTCyasp-3gu3iEplC6-ZP3OaRdugNpSHtlUAD6ZJIa92W5r990ptFSv7WQ13cqKZ9gtOYE3s8GZOvCd38HAwcgaWftOCnPEGDEPYTP3xnRzOaZbnKNOw3lHtJmZxIXVMvktNhz7BQbnynSieb-xKUYOYDzW5VlAeR3u19NC7jcmG7mw42BgmaKV95zNf5gfUusItpkpPEtV-1GWtP9dE4_mXH0XObab021JFCtzHTiPGT9hiW67ZPaMHmo3EqYeF9YzTlFpLwP19OHVODk6JV3FXWnYLjuQYGvrmzVDk89zTiqA], scope=[authority-c]},[Accept:"application/json;charset=UTF-8", Content-Type:"application/x-www-form-urlencoded;charset=UTF-8", Authorization:"Basic Y2xpZW50LWM6c2VjcmV0"]>
+
+Obtaining Tokens Using Authorization Code Grant
+Obtaining Tokens Using Implicit Grant
+Obtaining Tokens Using Resource Owner Password Credentials Grant
+Obtaining Tokens Using Client Credentials Grant
+
+
+
+        // @formatter:off
+        http
+            .cors()
+        .and()
+            .csrf()
+            .disable()
+            .headers()
+            .frameOptions()
+            .disable()
+        .and()
+            .httpBasic()
+            .realmName("JHipster Registry")
+        .and()
+            .authorizeRequests()
+            .antMatchers("/services/**").authenticated()
+            .antMatchers("/eureka/**").hasAuthority(AuthoritiesConstants.ADMIN)
+            .antMatchers("/config/**").hasAuthority(AuthoritiesConstants.ADMIN)
+            .antMatchers("/api/**").hasAuthority(AuthoritiesConstants.ADMIN)
+            .antMatchers("/management/info").permitAll()
+            .antMatchers("/management/health").permitAll()
+            .antMatchers("/management/**").hasAuthority(AuthoritiesConstants.ADMIN)
+            .antMatchers("/v2/api-docs/**").permitAll()
+            .antMatchers("/swagger-resources/configuration/**").permitAll()
+            .antMatchers("/swagger-ui/index.html").hasAuthority(AuthoritiesConstants.ADMIN)
+        .and()
+            .oauth2Login()
+        .and()
+            .oauth2ResourceServer().jwt();
+        // @formatter:on

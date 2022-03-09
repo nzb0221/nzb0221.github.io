@@ -7,8 +7,8 @@
 
 	<title>Angular World - Bootstrap</title>
 
-	<link rel="stylesheet" href="../../node_modules/reveal.js/dist/reveal.css">
-	<link rel="stylesheet" href="../../node_modules/reveal.js/dist/theme/black.css" id="theme">
+	<link rel="stylesheet" href="../../dist/reveal.js/reveal.css">
+	<link rel="stylesheet" href="../../dist/reveal.js/theme/black.css" id="theme">
 
 	<!-- Theme used for syntax highlighting of code -->
 	<link rel="stylesheet" href="../../css/hjs-night-owl.css">
@@ -20,6 +20,9 @@
 	<!-- Google fonts -->
 	<link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400&display=swap" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:300,400&display=swap" rel="stylesheet">
+
+	<!-- Highlight JS -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js"></script>
 
 	<!-- Fontawsome -->
 	<script defer src="https://use.fontawesome.com/releases/v5.0.8/js/all.js" integrity="sha384-SlE991lGASHoBfWbelyBPLsUlwY1GwNDJo3jSJO04KZ33K2bwfV9YBauFfnzvynJ"
@@ -46,7 +49,7 @@
 				<h3>Deep dive into Angular bootstrap sequence</h3>
 				<i class="fab fa-angular angular-logo"></i>
 				<p>
-					<small>Crafted with  
+					<small>Crafted with
 						<i class="fas fa-heart red-heart"></i>
 						by
 						<i class="fab fa-twitter"></i>
@@ -92,7 +95,7 @@
 		</div>
 	</div>
 
-	<script src="../../node_modules/reveal.js/dist/reveal.js"></script>
+	<script src="../../dist/reveal.js/reveal.js"></script>
 	<!-- <script src="../../node_modules/reveal.js/js/reveal.js"></script> -->
 
 	<script>
@@ -116,11 +119,11 @@
 				{ src: '../../node_modules/reveal_external/example/plugin/markdown/markdown.js' },
 
 				// Speaker notes
-				{ src: '../../node_modules/reveal.js/plugin/notes/notes.js', async: true },
+				{ src: '../../dist/reveal.js/plugin/notes/notes.js', async: true },
 
 				// Syntax highlight for <code> elements
-				{ src: '../../node_modules/reveal.js/plugin/highlight/highlight.js', async: true, callback: function () { hljs.initHighlightingOnLoad(); } },
-				{ src: '../../node_modules/reveal.js/plugin/highlight/highlight.js', async: true, callback: function () { hljs.initHighlightingOnLoad(); } },
+				{ src: '../../dist/reveal.js/plugin/highlight/highlight.js', async: true, callback: function () { hljs.initHighlightingOnLoad(); } },
+				{ src: '../../dist/reveal.js/plugin/highlight/highlight.js', async: true, callback: function () { hljs.initHighlightingOnLoad(); } },
 
 				// Fancy embed tweets
 				{ src: '../../node_modules/reveal.js-plugins/menu/tweet/embed-tweet.js' },
@@ -129,7 +132,7 @@
 				{ src: '../../node_modules/reveal_external/example/plugin/zoom-js/zoom.js', async: true },
 
 				// MathJax
-				{ src: '../../node_modules/reveal.js/plugin/math/math.js', async: true },
+				{ src: '../../dist/reveal.js/plugin/math/math.js', async: true },
 
 				// Fancy menu
 				{ src: '../../node_modules/reveal.js-plugins/menu/menu/menu.js', async: true},
@@ -138,18 +141,18 @@
 				//platuml
 				{ src: '//cdn.jsdelivr.net/npm/reveal-plantuml' },
 			],
-			keyboard: {	
-			// alternative to toggleSpotlightOnMouseDown: 
+			keyboard: {
+			// alternative to toggleSpotlightOnMouseDown:
 			// toggle spotlight by pressing key 'c'
 			120: function() { RevealSpotlight.toggleSpotlight() },
 
 			// enter/leave presentation mode by pressing key 'p'
-			80: function() { 
-				RevealSpotlight.togglePresentationMode(); 
+			80: function() {
+				RevealSpotlight.togglePresentationMode();
 			},
 		}
-		
-		);
+
+	});
 	</script>
 
 	<script>

@@ -1,0 +1,69 @@
+<section>
+    <h3 class="fragment fade-in-then-out">Before we look at the HomeComponent: </h3>
+    <pre data-cc="false" data-badge="app.module.ts" data-badge-class="demo">
+        <code class="typescript">
+import { NgModule } from '@angular/core';
+
+import { AppComponent } from './app.component';
+import { HttpClientModule } from '@angular/common/http';
+import { MyMaterialModule } from './my-material-module';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AwsService } from './home/aws.service';
+import { GoogleSigninComponent } from './home/google-signin-component/google-signin-component.component';
+
+import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { AppRoutingModule } from './app-routing.module';
+import { HomeComponent } from './home/home.component';
+import { LinksComponent } from './home/links/links.component';
+import { OAuthModule } from 'angular-oauth2-oidc';
+import { BASE_URL } from './app.tokens';
+import { CognitoSigninComponent } from './home/cognito-signin/cognito-signin.component';
+
+@NgModule({
+    declarations: [
+        AppComponent,
+        GoogleSigninComponent,
+        HomeComponent,
+        LinksComponent,
+        CognitoSigninComponent
+    ],
+    imports: [
+        BrowserModule,
+        BrowserAnimationsModule,
+        NoopAnimationsModule,
+        MyMaterialModule,
+        HttpClientModule,
+        FormsModule,
+        ReactiveFormsModule,
+        AppRoutingModule,
+        OAuthModule.forRoot(),
+        // JwksValidationHandler
+    ],
+    exports: [
+    ],
+    providers: [AwsService,
+        { provide: BASE_URL, useValue: 'http://www.angular.at' },
+    ],
+    bootstrap: [AppComponent]
+})
+export class AppModule {
+}
+        </code>
+    </pre>
+    <div class="r-stack">
+        <p class="fragment fade-in-then-out" data-code-focus="17">
+            import OauthModule from the angular-oauth2-oidc package.
+        </p>
+        <p class="fragment fade-in-then-out" data-code-focus="21">
+            for the NgModule
+        </p>
+        <p class="fragment fade-in-then-out" data-code-focus="29">
+            we can define and set this in the "imports"
+        </p>
+        <p class="fragment fade-in-then-out" data-code-focus="38">
+            we can define and set this in the "imports"
+        </p>
+    </div>
+</section>

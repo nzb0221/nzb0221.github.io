@@ -1,0 +1,237 @@
+SET LOGIN_CONFIG_URL=file://%PWD%/uaa/src/main/resources/required_configuration.yml
+
+uaac  target  http://externalAuthServer:9000/uaa
+uaac token client get admin -s password
+
+
+
+demo-oauth2-protocol-patterns stop-uaae
+
+Running locally finally worked!!
+Following documentation: https://docs.cloudfoundry.org/concepts/architecture/uaa.html#local
+There are other services I believe that are necessary beside uaa.war
+
+curl localhost:9001/uaa/info -H "Accept: application/json"
+uaac target http://internalAuthServer:9001/uaa
+uaac token client get admin -s adminsecret
+uaac context
+
+
+Trying if I can run from docker and use uaac
+docker pull cloudfoundry/uaa:75.1.0
+docker docker run -d cloudfoundry/uaa:75.1.0
+
+docker run -e "CATALINA_OPTS='-Dspring.profiles.active=default'" -p 8080:8080 cloudfoundry/uaa:75.1.0
+
+"JWT Bearer" grant type availability
+https://stackoverflow.com/questions/35691051/difference-between-scope-and-authority-in-uaa/57174494#57174494
+https://freesoft.dev/program/135068601
+
+https://github.com/cloudfoundry/uaa/issues/260
+https://www.pivotaltracker.com/n/projects/997278/stories/109101552
+https://support.okta.com/help/s/question/0D51Y00007nts7e/jwt-bearer-grant-type-availability?language=en_US
+
+https://developer.okta.com/docs/guides/implement-oauth-for-okta-serviceapp/get-access-token/
+
+curl --location --request POST 'https://{yourOktaDomain}/oauth2/v1/token' \
+    --header 'Accept: application/json' \
+    --header 'Content-Type: application/x-www-form-urlencoded' \
+    --data-urlencode 'grant_type=client_credentials' \
+    --data-urlencode 'scope=okta.users.read' \
+    --data-urlencode 'client_assertion_type=urn:ietf:params:oauth:client-assertion-type:jwt-bearer' \
+    --data-urlencode 'client_assertion=eyJhbGciOiJSU....tHQ6ggOnrG-ZFRSkZc8Pw'
+
+
+* Create Okta Apps
+
+1. Set .env file @C:\sandbox\git\bitbucket.org\drgeb\learning\javascript\typescript\manageOktaApp
+STACK_ENVIRONMENT_PREFIX = "poc-"
+APPLICATION_NAME = "login-client"
+
+REDIRECT_URI = "http://localhost:8080"
+POST_LOGOUT_REDIRECT_URI = "http://localhost:8080/login/oauth2/code/login-client"
+TRUSTED_ORIGINS_NAME = "oauth2-protocol-patterns-login-client"
+TRUSTED_ORIGINS_URL = "http://localhost:8080"
+
+2. run npm 
+> nr okta deploy
+
+- Running command
+-----1-------------------------------------------------------------
+* ensureOktaAppExists()
+name: poc-login-client
+label: login-client
+appName: poc-login-client
+redirectURI: http://localhost:8080
+postLogoutRedirectURI: http://localhost:8080/login/oauth2/code/login-client
+cloudfrontDistributionId: login-client
+------------------------------------------------------------------
+Application login-client does not exist.
+Finished creating: login-client
+-----2-------------------------------------------------------------
+*ensureTrustedOriginConfigured()
+updateTrustedOrigin
+Trusted origin created!
+Updated trusted origin.
+-----3-------------------------------------------------------------
+* ensureGroupIsAssignedToApp()
+Group already registered in Okta.
+* ensureApplicationGroupAssignment()
+appId: 0oaypze5u6hkYSLay0h7
+groupId: 00gtiofgsrHEqvFHi0h7
+OIDC app's issuer URL: https://txmonlinestaging.oktapreview.com/oauth2/default
+OIDC app's client ID: 0oaypze5u6hkYSLay0h7
+Group: SuperHeroes assigned to the Application: oidc_client
+
+
+=======================================================================================
+1. Set .env file @C:\sandbox\git\bitbucket.org\drgeb\learning\javascript\typescript\manageOktaApp
+STACK_ENVIRONMENT_PREFIX = "poc-"
+APPLICATION_NAME = "client-a"
+
+REDIRECT_URI = "http://localhost:8080/flow-a"
+POST_LOGOUT_REDIRECT_URI = "http://localhost:8080/login/oauth2/code/client-a"
+TRUSTED_ORIGINS_NAME = "oauth2-protocol-patterns-client-a"
+TRUSTED_ORIGINS_URL = "http://localhost:8080"
+
+// OKTA CONFIGURATIONS
+OKTA_ORG_URL= "https://txmonlinestaging.texasmutual.com/"
+# OKTA_TOKEN= "008J-lE4dy7fzP4gzmM9pFKfnfvk76ztcCR3p1nbHJ"
+OKTA_TOKEN= "00sJdFeLTLaC06Ubl7kiHTnHx2g6cTU31dCgHneBEe"
+OKTA_ISSUER= "https://txmonlinestaging.oktapreview.com/oauth2/default"
+
+2. run npm 
+> nr okta deploy
+
+- Running command
+-----1-------------------------------------------------------------
+* ensureOktaAppExists()
+name: poc-client-a
+label: client-a
+appName: poc-client-a
+redirectURI: http://localhost:8080/flow-a
+postLogoutRedirectURI: http://localhost:8080/login/oauth2/code/client-a
+cloudfrontDistributionId: client-a
+------------------------------------------------------------------
+Application client-a does not exist.
+Finished creating: client-a
+-----2-------------------------------------------------------------
+*ensureTrustedOriginConfigured()
+updateTrustedOrigin
+Trusted origin created!
+Updated trusted origin.
+-----3-------------------------------------------------------------
+* ensureGroupIsAssignedToApp()
+Group already registered in Okta.
+* ensureApplicationGroupAssignment()
+appId: 0oayq3kb4pKM34QQd0h7
+groupId: 00gtiofgsrHEqvFHi0h7
+OIDC app's issuer URL: https://txmonlinestaging.oktapreview.com/oauth2/default
+OIDC app's client ID: 0oayq3kb4pKM34QQd0h7
+Group: SuperHeroes assigned to the Application: oidc_client
+=======================================================================================
+STACK_ENVIRONMENT_PREFIX = "poc-"
+APPLICATION_NAME = "client-ab"
+
+REDIRECT_URI = "http://localhost:8080/flow-ab"
+POST_LOGOUT_REDIRECT_URI = "http://localhost:8080/login/oauth2/code/client-ab"
+TRUSTED_ORIGINS_NAME = "oauth2-protocol-patterns-client-ab"
+TRUSTED_ORIGINS_URL = "http://localhost:8080"
+
+// OKTA CONFIGURATIONS
+OKTA_ORG_URL= "https://txmonlinestaging.texasmutual.com/"
+# OKTA_TOKEN= "008J-lE4dy7fzP4gzmM9pFKfnfvk76ztcCR3p1nbHJ"
+OKTA_TOKEN= "00sJdFeLTLaC06Ubl7kiHTnHx2g6cTU31dCgHneBEe"
+OKTA_ISSUER= "https://txmonlinestaging.oktapreview.com/oauth2/default"
+
+2. run npm 
+> manageoktaapp@1.0.0 okta
+> cross-env NODE_EXTRA_CA_CERTS="cert\intermediate.pem" NODE_ENV=development ts-node -r dotenv/config lib\ensureOktaConfiguration.ts "deploy"
+
+- Running command
+-----1-------------------------------------------------------------
+* ensureOktaAppExists()
+name: poc-client-ab
+label: client-ab
+appName: poc-client-ab
+redirectURI: http://localhost:8080/flow-ab
+postLogoutRedirectURI: http://localhost:8080/login/oauth2/code/client-ab
+cloudfrontDistributionId: client-ab
+------------------------------------------------------------------
+Application client-ab does not exist.
+Finished creating: client-ab
+-----2-------------------------------------------------------------
+*ensureTrustedOriginConfigured()
+updateTrustedOrigin
+Trusted origin created!
+Updated trusted origin.
+-----3-------------------------------------------------------------
+* ensureGroupIsAssignedToApp()
+Group already registered in Okta.
+* ensureApplicationGroupAssignment()
+appId: 0oayq4jhwgYnTpfjS0h7
+groupId: 00gtiofgsrHEqvFHi0h7
+OIDC app's issuer URL: https://txmonlinestaging.oktapreview.com/oauth2/default
+OIDC app's client ID: 0oayq4jhwgYnTpfjS0h7
+Group: SuperHeroes assigned to the Application: oidc_client
+=======================================================================================
+1. Set .env file @C:\sandbox\git\bitbucket.org\drgeb\learning\javascript\typescript\manageOktaApp
+STACK_ENVIRONMENT_PREFIX = "poc-"
+APPLICATION_NAME = "client-abc"
+
+REDIRECT_URI = "http://localhost:8080/flow-abc"
+POST_LOGOUT_REDIRECT_URI = "http://localhost:8080/login/oauth2/code/client-abc"
+TRUSTED_ORIGINS_NAME = "oauth2-protocol-patterns-client-abc"
+TRUSTED_ORIGINS_URL = "http://localhost:8080"
+
+// OKTA CONFIGURATIONS
+OKTA_ORG_URL= "https://txmonlinestaging.texasmutual.com/"
+# OKTA_TOKEN= "008J-lE4dy7fzP4gzmM9pFKfnfvk76ztcCR3p1nbHJ"
+OKTA_TOKEN= "00sJdFeLTLaC06Ubl7kiHTnHx2g6cTU31dCgHneBEe"
+OKTA_ISSUER= "https://txmonlinestaging.oktapreview.com/oauth2/default"
+
+2. run npm 
+> nr okta deploy
+> manageoktaapp@1.0.0 okta
+> cross-env NODE_EXTRA_CA_CERTS="cert\intermediate.pem" NODE_ENV=development ts-node -r dotenv/config lib\ensureOktaConfiguration.ts "deploy"
+
+- Running command
+-----1-------------------------------------------------------------
+* ensureOktaAppExists()
+name: poc-client-abc
+label: client-abc
+appName: poc-client-abc
+redirectURI: http://localhost:8080/flow-abc
+postLogoutRedirectURI: http://localhost:8080/login/oauth2/code/client-abc
+cloudfrontDistributionId: client-abc
+------------------------------------------------------------------
+Application client-abc does not exist.
+Finished creating: client-abc
+-----2-------------------------------------------------------------
+*ensureTrustedOriginConfigured()
+createTrustedOrigin
+Trusted origin created!
+Created trusted origin.
+-----3-------------------------------------------------------------
+* ensureGroupIsAssignedToApp()
+Group already registered in Okta.
+* ensureApplicationGroupAssignment()
+appId: 0oayq5nkl8Qra1Ou20h7
+groupId: 00gtiofgsrHEqvFHi0h7
+OIDC app's issuer URL: https://txmonlinestaging.oktapreview.com/oauth2/default
+OIDC app's client ID: 0oayq5nkl8Qra1Ou20h7
+Group: SuperHeroes assigned to the Application: oidc_client
+=======================================================================================
+1. Set .env file @C:\sandbox\git\bitbucket.org\drgeb\learning\javascript\typescript\manageOktaApp
+
+2. run npm 
+> nr okta deploy
+=======================================================================================
+1. Set .env file @C:\sandbox\git\bitbucket.org\drgeb\learning\javascript\typescript\manageOktaApp
+2. run npm 
+> nr okta deploy
+
+-==
+https://txmonlinestaging.texasmutual.com/oauth2/ausxrjbeuvnLenFIg0h7/.well-known/oauth-authorization-server
+
+{"issuer":"https://txmonlinestaging.texasmutual.com/oauth2/ausxrjbeuvnLenFIg0h7","authorization_endpoint":"https://txmonlinestaging.texasmutual.com/oauth2/ausxrjbeuvnLenFIg0h7/v1/authorize","token_endpoint":"https://txmonlinestaging.texasmutual.com/oauth2/ausxrjbeuvnLenFIg0h7/v1/token","registration_endpoint":"https://txmonlinestaging.texasmutual.com/oauth2/v1/clients","jwks_uri":"https://txmonlinestaging.texasmutual.com/oauth2/ausxrjbeuvnLenFIg0h7/v1/keys","response_types_supported":["code","token","id_token","code id_token","code token","id_token token","code id_token token"],"response_modes_supported":["query","fragment","form_post","okta_post_message"],"grant_types_supported":["authorization_code","implicit","refresh_token","password","client_credentials"],"subject_types_supported":["public"],"scopes_supported":["openid","profile","email","address","phone","offline_access"],"token_endpoint_auth_methods_supported":["client_secret_basic","client_secret_post","client_secret_jwt","private_key_jwt","none"],"claims_supported":["ver","jti","iss","aud","iat","exp","cid","uid","scp","sub"],"code_challenge_methods_supported":["S256"],"introspection_endpoint":"https://txmonlinestaging.texasmutual.com/oauth2/ausxrjbeuvnLenFIg0h7/v1/introspect","introspection_endpoint_auth_methods_supported":["client_secret_basic","client_secret_post","client_secret_jwt","private_key_jwt","none"],"revocation_endpoint":"https://txmonlinestaging.texasmutual.com/oauth2/ausxrjbeuvnLenFIg0h7/v1/revoke","revocation_endpoint_auth_methods_supported":["client_secret_basic","client_secret_post","client_secret_jwt","private_key_jwt","none"],"end_session_endpoint":"https://txmonlinestaging.texasmutual.com/oauth2/ausxrjbeuvnLenFIg0h7/v1/logout","request_parameter_supported":true,"request_object_signing_alg_values_supported":["HS256","HS384","HS512","RS256","RS384","RS512","ES256","ES384","ES512"]}
